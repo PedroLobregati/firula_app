@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "675474357881",
+    "project_id": "firula-76dab",
+    "storage_bucket": "firula-76dab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675474357881:android:5fc01d37c740dc916c5ea8",
+        "android_client_info": {
+          "package_name": "com.example.firula_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675474357881-43nqdab2npao79svv94a05t4lpph8e2j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK7tscP3k6JJjFBi-wAMgvwPdf2Bq70bc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675474357881-43nqdab2npao79svv94a05t4lpph8e2j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
