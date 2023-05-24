@@ -23,6 +23,7 @@ class _MatchPageState extends State<MatchPage> {
   void initState(){
     super.initState();
     _activateListeners();
+    alreadyClicked();
   }
   late StreamSubscription _match;
   String displayLocal = '';
@@ -33,20 +34,22 @@ class _MatchPageState extends State<MatchPage> {
   int nMax = 0;
   bool _isListFull = false;
   DateTime? buttonClicked;
+  DateTime currentTime = DateTime.now();
   bool _isHost = false;
   User? user = FirebaseAuth.instance.currentUser;
+  bool solicitacaoEnviada = false;
 
-  bool alreadyClicked(DateTime currentTime) {
-    if (buttonClicked == null) {
-      buttonClicked = currentTime;
-      return false;
-    }
-    if (currentTime.difference(buttonClicked!).inSeconds < 10) {
-      return true;
-    }
-    buttonClicked = currentTime;
-    return true;
+  void alreadyClicked(){
+    _database.child('FirulaData/users/${user!.photoURL}/solicitParticip/${widget.matchId}/situation').once().then((DatabaseEvent event) {
+      print(event.snapshot.value);
+      if(event.snapshot.value != null){
+        setState(() {
+          solicitacaoEnviada = true;
+        });
+      }
+    });
   }
+
 
   void _activateListeners(){
     User? user = FirebaseAuth.instance.currentUser;
@@ -174,9 +177,13 @@ class _MatchPageState extends State<MatchPage> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData queryData;
+    queryData = MediaQuery.of(context);
     return SafeArea(
       child: Scaffold(
         body: Container(
+          height: queryData.size.height,
+          width: queryData.size.width,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/images/match3.jpg"),
@@ -346,18 +353,21 @@ class _MatchPageState extends State<MatchPage> {
               ),)),
       );
     }
-    else {
+    else{
       return Padding(
         padding: const EdgeInsets.only(top: 30),
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: _isListFull ? Colors.white70 : Color(0xffA2C850)),
+                backgroundColor: _isListFull || solicitacaoEnviada ? Colors.white70 : Color(0xffA2C850)),
             onPressed: () async {
-              _isListFull ? null : _sendToHost();
+              _isListFull || solicitacaoEnviada ? null : _sendToHost();
+              setState(() {
+                solicitacaoEnviada = true;
+              });
             },
             child: Text(
-              _isListFull ? "Lista Fechada" : "Solicitar participação",
-              style: const TextStyle(
+              _isListFull ? "Lista Fechada" : solicitacaoEnviada ? "Solicitação enviada" : "Solicitar participação",
+              style: TextStyle(color: _isListFull || solicitacaoEnviada ? Colors.grey : Colors.black,
                 fontSize: 20, fontWeight: FontWeight.bold,
               ),)),
       );

@@ -53,8 +53,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
             setState(() {
               displayname = nome;
-              displayloc == null || displayloc == '' ? displayloc = 'Não definido' : displayloc = localiz;
-              displaypos == null || displaypos == '' ? displaypos = 'Não definido' : displaypos = pos;
+              localiz == "" ? displayloc = 'Não definido' : displayloc = localiz;
+              pos == "" ? displaypos = 'Não definido' : displaypos = pos;
               displayemail = email;
             });
           });

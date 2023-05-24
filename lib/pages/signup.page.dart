@@ -198,86 +198,84 @@ class _SignupPageState extends State<SignupPage> {
 
   cadastrar() async {
     bool checkSign = true;
-      try {
-        checkSign = true;
-        UserCredential userCredential = await _firebaseAuth
-            .createUserWithEmailAndPassword(
-          email: _emailController.text, password: _passwordController.text,);
-        if (userCredential != null) {
-          userCredential.user!.updateDisplayName(_nameController.text);
-          final profileData = database.child('FirulaData/users').push();
-          await profileData.set(
-              {'nome': _name, 'email': _emailController.text, 'localiz': '', 'pos': '', 'id': profileData.key, 'possuiJogoCriado': false});
-          userCredential.user!.updatePhotoURL(profileData.key);
+
+    if (_emailController.text == null || _emailController.text == ''){
+      checkSign = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(duration: Duration(seconds: 1),content: Text('Email obrigatório'),),
+      );
+    }
+    if (_passwordController.text == null || _passwordController.text == ''){
+      checkSign = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(duration: Duration(seconds: 1),content: Text('Senha obrigatória'),),
+      );
+    }
+    if (_password.toString() != _confirmPassword.toString()) {
+      checkSign = false;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        duration: Duration(seconds: 1),
+        content: Text('Senhas diferentes'),
+        backgroundColor: Colors.redAccent,
+      ),
+      );
+    }
+    if (_name == null || _name == ''){
+      checkSign = false;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        duration: Duration(seconds: 1),
+        content: Text('Campo nome obrigatório'),
+        backgroundColor: Colors.redAccent,
+      ),
+      );
+    }
+      if (checkSign == true ){
+        try {
+          UserCredential userCredential = await _firebaseAuth
+              .createUserWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text,);
+          if (userCredential != null) {
+            userCredential.user!.updateDisplayName(_nameController.text);
+            final profileData = database.child('FirulaData/users').push();
+            await profileData.set(
+                {'nome': _name, 'email': _emailController.text, 'localiz': '', 'pos': '', 'id': profileData.key, 'possuiJogoCriado': false});
+            userCredential.user!.updatePhotoURL(profileData.key);
+          }
+
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'weak-password') {
+            checkSign = false;
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              duration: Duration(seconds: 1),
+              content: Text('Senha fraca.'),
+              backgroundColor: Colors.redAccent,
+            ),
+            );
+          }
+          else if (e.code == 'email-already-in-use') {
+            checkSign = false;
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              duration: Duration(seconds: 1),
+              content: Text('Email já cadastrado.'),
+              backgroundColor: Colors.redAccent,
+            ),
+            );
+          }
         }
 
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          checkSign = false;
+        if (checkSign == true){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            ),
+          );
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Senha fraca.'),
-            backgroundColor: Colors.redAccent,
+            content: Text('Cadastro realizado com sucesso!'),
+            backgroundColor: Colors.green,
           ),
           );
         }
-        else if (e.code == 'email-already-in-use') {
-          checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Email já cadastrado.'),
-            backgroundColor: Colors.redAccent,
-          ),
-          );
-        }
-
-        if (_passwordController.text != _confirmPasswordController.text) {
-          checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Senhas diferentes.'),
-            backgroundColor: Colors.redAccent,
-          ),
-          );
-        }
-        if (_emailController.text == null || _emailController.text == ''){
-          checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Email obrigatório'),),
-          );
-        }
-        if (_passwordController.text == null || _passwordController.text == ''){
-          checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Senha obrigatória'),),
-          );
-        }
-        if (_password != _confirmPassword) {
-          checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Senhas diferentes'),
-            backgroundColor: Colors.redAccent,
-          ),
-          );
-        } else if (_name == null || _name == ''){
-          checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Campo nome obrigatório'),
-            backgroundColor: Colors.redAccent,
-          ),
-          );
-        }
-      }
-
-      if (checkSign == true){
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoginPage(),
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Cadastro realizado com sucesso!'),
-          backgroundColor: Colors.green,
-        ),
-        );
       }
 
 

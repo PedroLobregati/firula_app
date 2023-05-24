@@ -58,6 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData queryData;
+    queryData = MediaQuery.of(context);
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: true,
