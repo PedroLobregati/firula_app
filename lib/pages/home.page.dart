@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
 
    _activateListeners(){
     final User? user = _firebaseAuth.currentUser;
-    final userId = user!.photoURL;
+    final userId = user!.uid;
   }
 
   @override
@@ -269,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                       String data = nextMatch['data'] as String;
                       String horario = nextMatch['time'] as String;
                       String host = nextMatch['host'] as String;
-                      String matchId = nextMatch['id'] as String;
+                      String matchId = key;
                       final orderTile = ListTile(
                         leading: const Icon(Icons.sports_soccer),
                         onTap: () {
@@ -311,7 +311,7 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 StreamBuilder(
-                  stream: _database.child('FirulaData/users/${user!.photoURL}/received').orderByKey().limitToLast(10).onValue,
+                  stream: _database.child('FirulaData/users/${user!.uid}/received').orderByKey().limitToLast(10).onValue,
                   builder: (context, snapshot) {
                     int notificacao = 0;
                     if (snapshot.data?.snapshot.value != null) {

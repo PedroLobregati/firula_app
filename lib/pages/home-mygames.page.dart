@@ -1,17 +1,13 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:easy_search_bar/easy_search_bar.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firula_app/pages/creategame.page.dart';
 import 'package:firula_app/pages/home.page.dart';
-import 'package:firula_app/pages/profile.page.dart';
 import 'package:firula_app/pages/user.profile.page.dart';
-import 'package:firula_app/widgets/list_games_view.dart';
 import 'package:firula_app/models/match.dart';
 import 'package:flutter/material.dart';
 
-import 'match.page.dart';
 
 class HomeMyGames extends StatefulWidget {
   const HomeMyGames({Key? key}) : super(key: key);
@@ -224,7 +220,7 @@ class _HomeMyGamesState extends State<HomeMyGames> {
                 const SizedBox(height: 20,),
 
                 StreamBuilder(stream:
-                _database.child('FirulaData/users/${user!.photoURL}/solicitParticip').orderByKey().limitToLast(10).onValue,
+                _database.child('FirulaData/users/${user!.uid}/solicitParticip').orderByKey().limitToLast(10).onValue,
                     builder: (context, snapshot){
                       final tileList = <ListTile>[];
                       if(snapshot.data?.snapshot.value != null) {

@@ -1,6 +1,7 @@
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firula_app/firebase_options.dart';
-import 'package:firula_app/pages/login.page.dart';
+import 'package:firula_app/provider/google_sign_in.dart';
 import 'package:firula_app/services/auth_service.dart';
 import 'package:firula_app/widgets/auth_check.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,8 @@ void main() async{
   runApp(
     MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => AuthService())
+          ChangeNotifierProvider(create: (context) => AuthService()),
+          ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
         ],
       child: MyApp(),
     ),

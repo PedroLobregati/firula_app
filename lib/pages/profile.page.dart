@@ -1,13 +1,13 @@
 import 'dart:async';
-
+// EDITADO 0307
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firula_app/models/user.dart';
+import 'package:provider/provider.dart';
 import 'package:firula_app/pages/home.page.dart';
 import 'package:firula_app/pages/login.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firula_app/services/auth_service.dart';
+import 'package:firula_app/provider/google_sign_in.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -18,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _firebaseAuth = FirebaseAuth.instance;
+  User? user = FirebaseAuth.instance.currentUser;
   final _database = FirebaseDatabase.instance.ref();
   String displayname = '';
   String displayemail = '';
@@ -37,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _activateListeners(){
     User? user = FirebaseAuth.instance.currentUser;
-    final uid = user!.photoURL;
+    final uid = user!.uid;
     _user = _database.child('FirulaData/users/$uid/localiz').onValue.listen((event) {
       final String localiz = event.snapshot.value as String;
       _database.child('FirulaData/users/$uid/pos').onValue.listen((event) {
@@ -104,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(height: 265,),
 
-                Text("${displayname.toUpperCase()}", style: TextStyle(fontSize: 30, color: Colors.white,
+                Text("${user?.displayName!}", style: TextStyle(fontSize: 30, color: Colors.white,
                 fontWeight: FontWeight.bold,),),
 
 
@@ -237,7 +238,18 @@ class _ProfilePageState extends State<ProfilePage> {
     Widget continueButton = TextButton(
       child: const Text("Logout", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       onPressed:  () async {
+        final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+        provider.googleLogout();
         sair();
+        //final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+        //provider.googleLogout().then(
+              //(user)=> Navigator.pushReplacement(
+            //context,
+            //MaterialPageRoute(
+              //builder: (context) => LoginPage(),
+            //),
+          //),
+        //);
       },
     );
     // set up the AlertDialog

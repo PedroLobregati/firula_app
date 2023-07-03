@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "675474357881",
+    "firebase_url": "https://firula-76dab-default-rtdb.firebaseio.com",
     "project_id": "firula-76dab",
     "storage_bucket": "firula-76dab.appspot.com"
   },
@@ -14,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "675474357881-43nqdab2npao79svv94a05t4lpph8e2j.apps.googleusercontent.com",
+          "client_id": "675474357881-f87dh2uj1bnkmkkprlnsl38nv861vjb5.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -29,6 +30,13 @@
             {
               "client_id": "675474357881-43nqdab2npao79svv94a05t4lpph8e2j.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "675474357881-43i5do5j1om6iu914jubarhmu90vhpl3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firulaApp"
+              }
             }
           ]
         }

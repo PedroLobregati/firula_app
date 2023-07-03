@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'home.page.dart';
@@ -37,7 +36,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
             SizedBox(height: 20,),
             StreamBuilder(stream:
-            _database.child('FirulaData/users/${user!.photoURL}/received').orderByKey().limitToLast(10).onValue,
+            _database.child('FirulaData/users/${user!.uid}/received').orderByKey().limitToLast(10).onValue,
                 builder: (context, snapshot){
                   final tileList = <ListTile>[];
                   if(snapshot.data!.snapshot.exists) {
@@ -91,7 +90,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                           .increment(1));
                                                       _database.child(
                                                           'FirulaData/users/${user!
-                                                              .photoURL}/received/${nextNotification['notId']}')
+                                                              .uid}/received/${nextNotification['notId']}')
                                                           .remove();
                                                       Navigator.pop(context);
 
@@ -109,7 +108,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                 ),
                                                 ElevatedButton(
                                                   onPressed: () async {
-                                                    _database.child('FirulaData/users/${user!.photoURL}/received/${nextNotification['notId']}').remove();
+                                                    _database.child('FirulaData/users/${user!.uid}/received/${nextNotification['notId']}').remove();
                                                     _database.child('FirulaData/users/${nextNotification['senderId']}/solicitParticip/${nextNotification['spId']}');
                                                     _database
                                                         .child(

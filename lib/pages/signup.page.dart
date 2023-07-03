@@ -235,10 +235,12 @@ class _SignupPageState extends State<SignupPage> {
               .createUserWithEmailAndPassword(
             email: _emailController.text, password: _passwordController.text,);
           if (userCredential != null) {
+            String email = _emailController.text;
+            print(email);
             userCredential.user!.updateDisplayName(_nameController.text);
-            final profileData = database.child('FirulaData/users').push();
-            await profileData.set(
-                {'nome': _name, 'email': _emailController.text, 'localiz': '', 'pos': '', 'id': profileData.key, 'possuiJogoCriado': false});
+            final profileData = database.child('FirulaData/users/${userCredential.user!.uid}');
+
+            await profileData.set({'nome': _name, 'email': _emailController.text, 'localiz': '', 'pos': '', 'possuiJogoCriado': false});
             userCredential.user!.updatePhotoURL(profileData.key);
           }
 

@@ -40,7 +40,7 @@ class _MatchPageState extends State<MatchPage> {
   bool solicitacaoEnviada = false;
 
   void alreadyClicked(){
-    _database.child('FirulaData/users/${user!.photoURL}/solicitParticip/${widget.matchId}/situation').once().then((DatabaseEvent event) {
+    _database.child('FirulaData/users/${user!.uid}/solicitParticip/${widget.matchId}/situation').once().then((DatabaseEvent event) {
       print(event.snapshot.value);
       if(event.snapshot.value != null){
         setState(() {
@@ -114,7 +114,7 @@ class _MatchPageState extends State<MatchPage> {
   void _sendToHost() async {
     User? user = FirebaseAuth.instance.currentUser;
 
-    final profileData = _database.child('FirulaData/users/${user!.photoURL}/solicitParticip/${widget.matchId}');
+    final profileData = _database.child('FirulaData/users/${user!.uid}/solicitParticip/${widget.matchId}');
     await profileData.set({
       'matchLocal' : displayLocal,
       'matchData'  : displayData,
@@ -132,7 +132,7 @@ class _MatchPageState extends State<MatchPage> {
             'FirulaData/users/$getHostId/received').push();
         await notData.set(
             {'content': "Solicitação de participação de $userName",
-              'senderId': '${user.photoURL}',
+              'senderId': '${user.uid}',
               'forMatchId': '${widget.matchId}',
               'username': '$userName',
               'notId': '${notData.key}',
@@ -144,28 +144,28 @@ class _MatchPageState extends State<MatchPage> {
   void cancelMatch() async{
 
     _database.child('FirulaData/matches/${widget.matchId}').remove();
-    _database.child('FirulaData/users/${user!.photoURL}').update(
+    _database.child('FirulaData/users/${user!.uid}').update(
         {'possuiJogoCriado' : false});
     final ref = FirebaseDatabase.instance.ref().child('FirulaData/matches/${widget.matchId}/participants').orderByKey();
     ref.get().then((snapshot) {
       for (final participant in snapshot.children) {
         String userId = participant.child("userId").value as String;
-        if(userId != user!.photoURL){
+        if(userId != user!.uid){
           _database.child('FirulaData/users/$userId/solicitParticip/${widget.matchId}').update({
             'situation': 'Partida cancelada!',
           });
         }
       }
     });
-    final ref3 = FirebaseDatabase.instance.ref().child('FirulaData/users/${user!.photoURL}');
+    final ref3 = FirebaseDatabase.instance.ref().child('FirulaData/users/${user!.uid}');
     await ref3.child("received").once().then((snapshot) {
       if (snapshot.snapshot.exists) {
-        final ref2 = FirebaseDatabase.instance.ref().child('FirulaData/users/${user!.photoURL}/received').orderByKey();
+        final ref2 = FirebaseDatabase.instance.ref().child('FirulaData/users/${user!.uid}/received').orderByKey();
         ref2.get().then((snapshot) {
           for (final recebido in snapshot.children) {
             String forMatchId = recebido.child("forMatchId").value as String;
             if(forMatchId == widget.matchId){
-              _database.child('FirulaData/users/${user!.photoURL}/received/${recebido.key}').remove();
+              _database.child('FirulaData/users/${user!.uid}/received/${recebido.key}').remove();
             }
           }
         });

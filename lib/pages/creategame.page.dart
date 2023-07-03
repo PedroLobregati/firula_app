@@ -20,7 +20,7 @@ class _CreateGameState extends State<CreateGame> {
     _activateListeners();
   }
   void _activateListeners(){
-    database.child('FirulaData/users/${user!.photoURL}/possuiJogoCriado').onValue.listen((event) {
+    database.child('FirulaData/users/${user!.uid}/possuiJogoCriado').onValue.listen((event) {
       final bool possuiJogoCriado = event.snapshot.value as bool;
       setState(() {
         jaPossuiJogo = possuiJogoCriado;
@@ -216,14 +216,14 @@ class _CreateGameState extends State<CreateGame> {
               'nPlayers': nMax,
               'host': host,
               'id': profileData.key,
-              'hostId': user!.photoURL,
+              'hostId': user!.uid,
               'onList': 1,
             });
         final matchData = database.child(
             'FirulaData/matches/${profileData.key}/participants').push();
         await matchData.set(
-            {'userId': user!.photoURL, 'username': user.displayName});
-        database.child('FirulaData/users/${user.photoURL}').update({
+            {'userId': user!.uid, 'username': user.displayName});
+        database.child('FirulaData/users/${user.uid}').update({
           'possuiJogoCriado' : true,
         });
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

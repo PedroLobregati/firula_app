@@ -2,7 +2,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firula_app/pages/home.page.dart';
 import 'package:firula_app/pages/signup.page.dart';
+import 'package:firula_app/provider/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -109,10 +112,20 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             SizedBox(
-              height: 10,
+              height: 20,
             ),
-            SizedBox(
-              height: 10,
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+
+              ),
+              onPressed: (){
+                final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+                provider.googleLogin();
+              },
+              icon:FaIcon(FontAwesomeIcons.google, color: Colors.red,) ,
+              label: Text("Entre com Google", style: TextStyle(fontWeight: FontWeight.bold),),
             ),
             Container(
               height: 40,
