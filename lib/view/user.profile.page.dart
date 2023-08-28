@@ -1,11 +1,7 @@
 import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'match.page.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key, required this.userId});
@@ -17,7 +13,6 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
 
-  final _firebaseAuth = FirebaseAuth.instance;
   final _database = FirebaseDatabase.instance.ref();
   String displayname = '';
   String displayemail = '';
@@ -30,39 +25,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     _activateListeners();
   }
   late StreamSubscription _user;
-
-  void _activateListeners(){
-    _user = _database.child('FirulaData/users/${widget.userId}/nome').onValue.listen((event) {
-      final String nome = event.snapshot.value as String;
-      _database
-          .child('FirulaData/users/${widget.userId}/localiz')
-          .onValue
-          .listen((event) {
-        final String localiz = event.snapshot.value as String;
-        _database
-            .child('FirulaData/users/${widget.userId}/pos')
-            .onValue
-            .listen((event) {
-          final String pos = event.snapshot.value as String;
-
-          _database
-              .child('FirulaData/users/${widget.userId}/email')
-              .onValue
-              .listen((event) {
-            final String email = event.snapshot.value as String;
-
-            setState(() {
-              displayname = nome;
-              localiz == "" ? displayloc = 'Não definido' : displayloc = localiz;
-              pos == "" ? displaypos = 'Não definido' : displaypos = pos;
-              displayemail = email;
-            });
-          });
-        });
-      });
-    });
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,5 +66,50 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
 
      );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  void _activateListeners(){
+    _user = _database.child('FirulaData/users/${widget.userId}/nome').onValue.listen((event) {
+      final String nome = event.snapshot.value as String;
+      _database
+          .child('FirulaData/users/${widget.userId}/localiz')
+          .onValue
+          .listen((event) {
+        final String localiz = event.snapshot.value as String;
+        _database
+            .child('FirulaData/users/${widget.userId}/pos')
+            .onValue
+            .listen((event) {
+          final String pos = event.snapshot.value as String;
+
+          _database
+              .child('FirulaData/users/${widget.userId}/email')
+              .onValue
+              .listen((event) {
+            final String email = event.snapshot.value as String;
+
+            setState(() {
+              displayname = nome;
+              localiz == "" ? displayloc = 'Não definido' : displayloc = localiz;
+              pos == "" ? displaypos = 'Não definido' : displaypos = pos;
+              displayemail = email;
+            });
+          });
+        });
+      });
+    });
+
   }
 }

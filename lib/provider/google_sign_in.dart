@@ -45,7 +45,7 @@ class GoogleSignInProvider extends ChangeNotifier{
         print('Usuário já existe');
       } else {
         userRef.set({
-          'name': user.displayName,
+          'nome': user.displayName,
           'email': user.email,
           'photoUrl': user.photoURL,
           'pos': '',

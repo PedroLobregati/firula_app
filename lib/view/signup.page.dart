@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firula_app/pages/login.page.dart';
+import 'package:firula_app/controller/UserController.dart';
+import 'package:firula_app/view/login.page.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../widgets/auth_check.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -13,6 +12,7 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
+  final userController = UserController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
@@ -164,7 +164,7 @@ class _SignupPageState extends State<SignupPage> {
                       textAlign: TextAlign.center,
                     ),
                     onPressed: () async {
-                      cadastrar();
+                      userController.cadastrar(_emailController.text, _passwordController.text, _confirmPasswordController.text, _nameController.text, context);
                       try{
                         print('Written successfully');
                       }catch(e) {
@@ -196,90 +196,4 @@ class _SignupPageState extends State<SignupPage> {
 
   }
 
-  cadastrar() async {
-    bool checkSign = true;
-
-    if (_emailController.text == null || _emailController.text == ''){
-      checkSign = false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(duration: Duration(seconds: 1),content: Text('Email obrigatório'),),
-      );
-    }
-    if (_passwordController.text == null || _passwordController.text == ''){
-      checkSign = false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(duration: Duration(seconds: 1),content: Text('Senha obrigatória'),),
-      );
-    }
-    if (_password.toString() != _confirmPassword.toString()) {
-      checkSign = false;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text('Senhas diferentes'),
-        backgroundColor: Colors.redAccent,
-      ),
-      );
-    }
-    if (_name == null || _name == ''){
-      checkSign = false;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text('Campo nome obrigatório'),
-        backgroundColor: Colors.redAccent,
-      ),
-      );
-    }
-      if (checkSign == true ){
-        try {
-          UserCredential userCredential = await _firebaseAuth
-              .createUserWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text,);
-          if (userCredential != null) {
-            String email = _emailController.text;
-            print(email);
-            userCredential.user!.updateDisplayName(_nameController.text);
-            final profileData = database.child('FirulaData/users/${userCredential.user!.uid}');
-
-            await profileData.set({'nome': _name, 'email': _emailController.text, 'localiz': '', 'pos': '', 'possuiJogoCriado': false});
-            userCredential.user!.updatePhotoURL(profileData.key);
-          }
-
-        } on FirebaseAuthException catch (e) {
-          if (e.code == 'weak-password') {
-            checkSign = false;
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              duration: Duration(seconds: 1),
-              content: Text('Senha fraca.'),
-              backgroundColor: Colors.redAccent,
-            ),
-            );
-          }
-          else if (e.code == 'email-already-in-use') {
-            checkSign = false;
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              duration: Duration(seconds: 1),
-              content: Text('Email já cadastrado.'),
-              backgroundColor: Colors.redAccent,
-            ),
-            );
-          }
-        }
-
-        if (checkSign == true){
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LoginPage(),
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Cadastro realizado com sucesso!'),
-            backgroundColor: Colors.green,
-          ),
-          );
-        }
-      }
-
-
-  }
 }

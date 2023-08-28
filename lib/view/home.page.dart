@@ -3,13 +3,12 @@ import 'package:badges/badges.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
-import 'package:firula_app/pages/creategame.page.dart';
-import 'package:firula_app/pages/home-mygames.page.dart';
-import 'package:firula_app/pages/match.page.dart';
-import 'package:firula_app/pages/notification.page.dart';
-import 'package:firula_app/pages/profile.page.dart';
-import 'package:firula_app/models/match.dart';
-import 'package:firula_app/pages/user.profile.page.dart';
+import 'package:firula_app/view/creategame.page.dart';
+import 'package:firula_app/view/home-mygames.page.dart';
+import 'package:firula_app/view/match.page.dart';
+import 'package:firula_app/view/notification.page.dart';
+import 'package:firula_app/view/profile.page.dart';
+import 'package:firula_app/view/user.profile.page.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:intl/intl.dart';
@@ -35,14 +34,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState(){
     super.initState();
-    _activateListeners();
   }
   late StreamSubscription _match;
 
-   _activateListeners(){
-    final User? user = _firebaseAuth.currentUser;
-    final userId = user!.uid;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,8 +160,6 @@ class _HomePageState extends State<HomePage> {
             ),
 
                 _buildSearch(),
-
-
 
                 const SizedBox(height: 7,),
 
@@ -361,38 +353,7 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-  void showOverlay(BuildContext context){
-     OverlayState? overlayState = Overlay.of(context);
-     OverlayEntry overlayEntry = OverlayEntry(builder: (context) => Expanded(
-       child: FirebaseAnimatedList(
-         query: _database.child('FirulaData/users'),
-         itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation<double> animation, int index) {
-           var data = snapshot.value as Map?;
-           String tempTitle = data!['nome'];
-           String tempId = data['id'];
-           if(searchController.text.isEmpty){
-             return SizedBox(height: 1,);
-           }
-           else if (tempTitle.contains(searchController.text.toString())){
-             return ElevatedButton.icon(onPressed: (){},
-               icon: Icon(Icons.person, size: 14,),
-               label: Text(tempTitle,
-                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w200),),
-               style: ElevatedButton.styleFrom(
-                 backgroundColor: Colors.white70,
-               ),);
-           }
-           else{
-             return SizedBox(height: 1,);
-           }
-         },),
-     ),
-     );
-     overlayState!.insert(overlayEntry);
-  }
-
   Widget _buildSearch(){
-
      if(searchBarInUse == true){
     return Expanded(
       child: FirebaseAnimatedList(
@@ -400,7 +361,7 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation<double> animation, int index) {
           var data = snapshot.value as Map?;
           String tempTitle = data!['nome'];
-          String tempId = data['id'];
+          String tempId = snapshot.key!;
           if(searchController.text.isEmpty){
             return SizedBox(height: 1,);
           }
