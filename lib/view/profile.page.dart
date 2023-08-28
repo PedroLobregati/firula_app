@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:provider/provider.dart';
-import 'package:firula_app/pages/home.page.dart';
-import 'package:firula_app/pages/login.page.dart';
+import 'package:firula_app/view/home.page.dart';
+import 'package:firula_app/view/login.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firula_app/provider/google_sign_in.dart';
+
+import '../controller/UserController.dart';
+import '../model/UserModel.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -19,7 +22,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final _firebaseAuth = FirebaseAuth.instance;
   User? user = FirebaseAuth.instance.currentUser;
-  final _database = FirebaseDatabase.instance.ref();
+  final userController = UserController();
   String displayname = '';
   String displayemail = '';
   String displayloc = '';
@@ -28,34 +31,20 @@ class _ProfilePageState extends State<ProfilePage> {
   final _posController = TextEditingController();
   bool changedLoc = false;
   bool changedPos = false;
+  UserModel? userModel;
 
   @override
   void initState(){
     super.initState();
-    _activateListeners();
+    userController.carregarInfoPerfil(_onDataReceived);
   }
   late StreamSubscription _user;
 
-  void _activateListeners(){
-    User? user = FirebaseAuth.instance.currentUser;
-    final uid = user!.uid;
-    _user = _database.child('FirulaData/users/$uid/localiz').onValue.listen((event) {
-      final String localiz = event.snapshot.value as String;
-      _database.child('FirulaData/users/$uid/pos').onValue.listen((event) {
-        final String pos = event.snapshot.value as String;
-        setState(() {
-          displayname = user.displayName!;
-          displayemail = user.email!;
-          displayloc = localiz;
-          displaypos = pos;
-        });
-      });
+  void _onDataReceived(UserModel userData) {
+    setState(() {
+      userModel = userData;
     });
-
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               },
                               decoration: InputDecoration(
                                 floatingLabelBehavior: FloatingLabelBehavior.never,
-                                labelText: displaypos == '' ? "Definir posição..." : displaypos,
+                                labelText: userModel!.pos == '' ? "Definir posição..." : userModel!.pos,
                                 labelStyle: TextStyle(
                                   fontSize: 17.5,
                                   color: Colors.white70,
@@ -142,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Padding(
                             padding: const EdgeInsets.only(top:8.0),
                               
-                            child: Text(displayemail,
+                            child: Text(userModel?.email == null ? " " : userModel!.email,
                               style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -161,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               },
                               decoration: InputDecoration(
                                 floatingLabelBehavior: FloatingLabelBehavior.never,
-                                labelText: displayloc == '' ? "Definir localização..." : displayloc,
+                                labelText: userModel!.localiz== '' ? "Definir localização..." : userModel!.localiz,
                                 labelStyle: TextStyle(
                                   fontSize: 17.5,
                                   color: Colors.white70,
@@ -182,21 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     backgroundColor: Colors.black,
                   ),
                     onPressed: () async {
-                      User? user = FirebaseAuth.instance.currentUser;
-                      final uid = user!.photoURL;
-                      if(changedLoc == true && changedPos == false){
-                        final profileData = _database.child('FirulaData/users/$uid').update(
-                            {'localiz': _localizController.text});
-                      }
-                      else if(changedLoc == false && changedPos == true){
-                        final profileData = _database.child('FirulaData/users/$uid').update(
-                            {'pos': _posController.text});
-                      }
-                      else if (changedLoc == true && changedPos == true){
-                        final profileData = _database.child('FirulaData/users/$uid').update(
-                            {'localiz': _localizController.text, 'pos': _posController.text});
-                      }
-
+                      userController.salvarAlteracoes(changedLoc, changedPos, _localizController.text, _posController.text);
                     },
                     child: const Text('Salvar alterações',
                       style: TextStyle(fontSize: 15),)),

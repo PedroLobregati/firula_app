@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -158,13 +157,5 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
     );
   }
-
-  void _showMessage(String errorMessage) {
-    final snackBar = SnackBar(
-      content: Text(errorMessage),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
 
 }

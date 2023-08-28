@@ -1,16 +1,18 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firula_app/pages/user.profile.page.dart';
+import 'package:firula_app/controller/MatchController.dart';
+import 'package:firula_app/services/UserService.dart';
+import 'package:firula_app/view/user.profile.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../model/MatchModel.dart';
 import 'home.page.dart';
 
 class MatchPage extends StatefulWidget {
   const MatchPage({super.key, required this.matchId});
   final String matchId;
+
 
   @override
   State<MatchPage> createState() => _MatchPageState();
@@ -18,162 +20,31 @@ class MatchPage extends StatefulWidget {
 
 class _MatchPageState extends State<MatchPage> {
   final _database = FirebaseDatabase.instance.ref();
+  final MatchController _matchController = MatchController();
+  MatchModel? _matchData;
 
   @override
   void initState(){
     super.initState();
-    _activateListeners();
+    _matchController.CarregarinformacoesDaPartida(widget.matchId, _onDataReceived);
     alreadyClicked();
   }
+
+  void _onDataReceived(MatchModel matchData) {
+    setState(() {
+      _matchData = matchData;
+    });
+  }
+
   late StreamSubscription _match;
-  String displayLocal = '';
-  String displayTime = '';
-  String displayHost = '';
-  String displayData = '';
   int onList = 1;
   int nMax = 0;
   bool _isListFull = false;
   DateTime? buttonClicked;
   DateTime currentTime = DateTime.now();
-  bool _isHost = false;
   User? user = FirebaseAuth.instance.currentUser;
   bool solicitacaoEnviada = false;
-
-  void alreadyClicked(){
-    _database.child('FirulaData/users/${user!.uid}/solicitParticip/${widget.matchId}/situation').once().then((DatabaseEvent event) {
-      print(event.snapshot.value);
-      if(event.snapshot.value != null){
-        setState(() {
-          solicitacaoEnviada = true;
-        });
-      }
-    });
-  }
-
-
-  void _activateListeners(){
-    User? user = FirebaseAuth.instance.currentUser;
-    _match = _database.child('FirulaData/matches/${widget.matchId}/local').onValue.listen((event) {
-      final String localiz = event.snapshot.value as String;
-      _database
-          .child('FirulaData/matches/${widget.matchId}/time')
-          .onValue
-          .listen((event) {
-        final String time = event.snapshot.value as String;
-        _database
-            .child('FirulaData/matches/${widget.matchId}/host')
-            .onValue
-            .listen((event) {
-          final String host = event.snapshot.value as String;
-          _database
-              .child('FirulaData/matches/${widget.matchId}/onList')
-              .onValue
-              .listen((event) {
-            final int onList1 = event.snapshot.value as int;
-            _database
-                .child('FirulaData/matches/${widget.matchId}/data')
-                .onValue
-                .listen((event) {
-              final String data = event.snapshot.value as String;
-
-              _database
-                  .child('FirulaData/matches/${widget.matchId}/nPlayers')
-                  .onValue
-                  .listen((event) {
-                final int nMax1 = event.snapshot.value as int;
-
-                _database
-                    .child('FirulaData/matches/${widget.matchId}/hostId')
-                    .onValue
-                    .listen((event) {
-                      final String hostId = event.snapshot.value as String;
-
-                  setState(() {
-                    displayLocal = localiz;
-                    displayTime = time;
-                    displayHost = host;
-                    displayData = data;
-                    onList = onList1;
-                    nMax = nMax1;
-                    if (onList >= nMax) {
-                      _isListFull = true;
-                    }
-                    if (hostId == user!.photoURL){
-                      _isHost = true;
-                    }
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-  }
-
-  void _sendToHost() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    final profileData = _database.child('FirulaData/users/${user!.uid}/solicitParticip/${widget.matchId}');
-    await profileData.set({
-      'matchLocal' : displayLocal,
-      'matchData'  : displayData,
-      'situation' : 'Aguardando resposta...',
-    });
-
-      _database
-          .child('FirulaData/matches/${widget.matchId}/hostId')
-          .onValue
-          .listen((event) async {
-        final userName = user!.displayName;
-        final getHostId = event.snapshot.value as String;
-        print(getHostId);
-        final notData = _database.child(
-            'FirulaData/users/$getHostId/received').push();
-        await notData.set(
-            {'content': "Solicitação de participação de $userName",
-              'senderId': '${user.uid}',
-              'forMatchId': '${widget.matchId}',
-              'username': '$userName',
-              'notId': '${notData.key}',
-              'spId': profileData.key});
-      });
-
-  }
-
-  void cancelMatch() async{
-
-    _database.child('FirulaData/matches/${widget.matchId}').remove();
-    _database.child('FirulaData/users/${user!.uid}').update(
-        {'possuiJogoCriado' : false});
-    final ref = FirebaseDatabase.instance.ref().child('FirulaData/matches/${widget.matchId}/participants').orderByKey();
-    ref.get().then((snapshot) {
-      for (final participant in snapshot.children) {
-        String userId = participant.child("userId").value as String;
-        if(userId != user!.uid){
-          _database.child('FirulaData/users/$userId/solicitParticip/${widget.matchId}').update({
-            'situation': 'Partida cancelada!',
-          });
-        }
-      }
-    });
-    final ref3 = FirebaseDatabase.instance.ref().child('FirulaData/users/${user!.uid}');
-    await ref3.child("received").once().then((snapshot) {
-      if (snapshot.snapshot.exists) {
-        final ref2 = FirebaseDatabase.instance.ref().child('FirulaData/users/${user!.uid}/received').orderByKey();
-        ref2.get().then((snapshot) {
-          for (final recebido in snapshot.children) {
-            String forMatchId = recebido.child("forMatchId").value as String;
-            if(forMatchId == widget.matchId){
-              _database.child('FirulaData/users/${user!.uid}/received/${recebido.key}').remove();
-            }
-          }
-        });
-      }
-    });
-
-
-  }
+  final userService = UserService();
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +102,7 @@ class _MatchPageState extends State<MatchPage> {
                                     children: [
                                       Icon(Icons.place),
                                       SizedBox(width: 20,),
-                                      Text(displayLocal,
+                                      Text('${_matchData!.local}',
                                         style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),),
 
                                     ],
@@ -241,7 +112,7 @@ class _MatchPageState extends State<MatchPage> {
                                     children: [
                                       Icon(Icons.calendar_month_rounded),
                                       SizedBox(width: 20,),
-                                      Text(displayData,
+                                      Text('${_matchData!.data}',
                                         style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),),
 
                                     ],
@@ -251,7 +122,7 @@ class _MatchPageState extends State<MatchPage> {
                                     children: [
                                       Icon(Icons.watch_later),
                                       SizedBox(width: 20,),
-                                      Text(displayTime,
+                                      Text('${_matchData!.time}',
                                         style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),),
 
                                     ],
@@ -272,7 +143,7 @@ class _MatchPageState extends State<MatchPage> {
                   children: [
                      Icon(Icons.stars),
                      SizedBox(width: 6,),
-                     Text("Criado por: $displayHost",
+                     Text("Criado por: ${_matchData!.host}",
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                   ],
                 ),
@@ -281,7 +152,7 @@ class _MatchPageState extends State<MatchPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextButton.icon(onPressed: (){}, icon: Icon(Icons.checklist, color: Colors.black,), label: Text("Lista vigente", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Colors.black,),)),
-                    Text("   ($onList / $nMax)",
+                    Text("   (${_matchData!.onList} / ${_matchData!.nPlayers})",
                       style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.green),)
                   ],
                 ),
@@ -336,7 +207,7 @@ class _MatchPageState extends State<MatchPage> {
     );
   }
   Widget _buildButton(){
-    if(_isHost){
+    if(user!.uid == _matchData!.hostId){
       return Padding(
         padding: const EdgeInsets.only(top: 30),
         child: ElevatedButton(
@@ -360,7 +231,7 @@ class _MatchPageState extends State<MatchPage> {
             style: ElevatedButton.styleFrom(
                 backgroundColor: _isListFull || solicitacaoEnviada ? Colors.white70 : Color(0xffA2C850)),
             onPressed: () async {
-              _isListFull || solicitacaoEnviada ? null : _sendToHost();
+              _isListFull || solicitacaoEnviada ? null : userService.sendToHost(widget.matchId, _matchData!.local, _matchData!.data);
               setState(() {
                 solicitacaoEnviada = true;
               });
@@ -396,7 +267,7 @@ class _MatchPageState extends State<MatchPage> {
             builder: (context) => const HomePage(),
           ),
         );
-        cancelMatch();
+        _matchController.cancelMatch(widget.matchId);
       },
     );
     // set up the AlertDialog
@@ -416,6 +287,33 @@ class _MatchPageState extends State<MatchPage> {
       },
     );
   }
+
+
+
+
+
+
+
+  void alreadyClicked(){
+    _database.child('FirulaData/users/${user!.uid}/solicitParticip/${widget.matchId}/situation').once().then((DatabaseEvent event) {
+      print(event.snapshot.value);
+      if(event.snapshot.value != null){
+        setState(() {
+          solicitacaoEnviada = true;
+        });
+      }
+    });
+  }
 }
+
+
+
+
+
+
+
+
+
+
 
 

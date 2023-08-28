@@ -1,16 +1,17 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firula_app/pages/home.page.dart';
-import 'package:firula_app/pages/signup.page.dart';
+import 'package:firula_app/view/signup.page.dart';
 import 'package:firula_app/provider/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../controller/UserController.dart';
+
 class LoginPage extends StatefulWidget {
 
 
-  LoginPage({super.key});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -22,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   final _firebaseAuth = FirebaseAuth.instance;
+  final userController = UserController();
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   onPressed: () {
-                    login();
+                    userController.login( _emailController.text, _passwordController.text, context);
                   },
                 ),
               ),
@@ -150,44 +152,6 @@ class _LoginPageState extends State<LoginPage> {
     );
 
   }
-  login() async{
-    try{
-      UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-          email: _emailController.text, password: _passwordController.text);
-      if(userCredential != null){
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(),
-          ),
-        );
-      }
-    }on FirebaseAuthException catch(e){
-      if(e.code == 'user-not-found'){
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Usuário não encontrado')
-        ),
-        );
-      }
-      else if (e.code == 'wrong-password'){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Senha incorreta'),),
-        );
-      }
-     if (_emailController.text == null || _emailController.text == ''){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email vazio'),),
-        );
-      }
-      if (_passwordController.text == null || _passwordController.text == ''){
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Senha vazia'),),
-        );
-      }
-
-    }
-  }
-
   String? emailVazio(String? value){
     if (value == null || value.isEmpty)
       return 'Email não preenchido';
@@ -195,12 +159,6 @@ class _LoginPageState extends State<LoginPage> {
       return null;
   }
 
-  String? senhaVazia(String? value){
-    if (value == null || value.isEmpty)
-      return 'Senha não preenchida';
-    else
-      return null;
-  }
 
 
 }

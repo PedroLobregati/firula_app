@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
-import 'package:firula_app/pages/creategame.page.dart';
-import 'package:firula_app/pages/home.page.dart';
-import 'package:firula_app/pages/user.profile.page.dart';
-import 'package:firula_app/models/match.dart';
+import 'package:firula_app/view/creategame.page.dart';
+import 'package:firula_app/view/home.page.dart';
+import 'package:firula_app/view/user.profile.page.dart';
 import 'package:flutter/material.dart';
 
 
@@ -28,19 +27,8 @@ class _HomeMyGamesState extends State<HomeMyGames> {
   @override
   void initState(){
     super.initState();
-    _activateListeners();
   }
   late StreamSubscription _match;
-
-
-
-  void _activateListeners(){
-    _match = _database.child('FirulaData/matches/').onValue.listen((event) {
-      final data = new Map<String, dynamic>.from(event.snapshot.value as dynamic);
-      final match = Match.fromRTDB(data);
-
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

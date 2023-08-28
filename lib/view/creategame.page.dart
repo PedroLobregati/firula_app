@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firula_app/pages/home.page.dart';
+import 'package:firula_app/controller/UserController.dart';
+import 'package:firula_app/view/home.page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,23 +14,21 @@ class CreateGame extends StatefulWidget {
 }
 
 class _CreateGameState extends State<CreateGame> {
+  final userController = UserController();
 
   @override
   void initState(){
     super.initState();
-    _activateListeners();
-  }
-  void _activateListeners(){
-    database.child('FirulaData/users/${user!.uid}/possuiJogoCriado').onValue.listen((event) {
-      final bool possuiJogoCriado = event.snapshot.value as bool;
+    userController.verificarJogoCriado().then((bool resultado) {
       setState(() {
-        jaPossuiJogo = possuiJogoCriado;
+        jaPossuiJogo = resultado;
       });
     });
-
   }
+
   final database = FirebaseDatabase.instance.ref();
   User? user = FirebaseAuth.instance.currentUser;
+
 
   final TextEditingController matchLocalController = TextEditingController();
 
@@ -194,56 +193,11 @@ class _CreateGameState extends State<CreateGame> {
       ),
     );
   }
-  void publicar() async {
-      if (matchLocalController.text == null || matchLocalController.text == ''
-          || matchDataController.text == null || matchLocalController.text == ''
-          || matchPlayersController.text == null ||
-          matchPlayersController.text == ''
-          || matchTimeController.text == null ||
-          matchTimeController.text == '') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preencha todos os campos'),),
-        );
-      }
-      else {
-        User? user = FirebaseAuth.instance.currentUser;
-        String host = user?.displayName ?? 'Anonymous';
-        final profileData = database.child('FirulaData/matches/').push();
-        await profileData.set(
-            {'local': matchLocalController.text,
-              'data': matchDataController.text,
-              'time': matchTimeController.text,
-              'nPlayers': nMax,
-              'host': host,
-              'id': profileData.key,
-              'hostId': user!.uid,
-              'onList': 1,
-            });
-        final matchData = database.child(
-            'FirulaData/matches/${profileData.key}/participants').push();
-        await matchData.set(
-            {'userId': user!.uid, 'username': user.displayName});
-        database.child('FirulaData/users/${user.uid}').update({
-          'possuiJogoCriado' : true,
-        });
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Jogo criado com sucesso'),
-          backgroundColor: Colors.lightGreen,
-        ));
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const HomePage(),
-          ),
-        );
-      }
-  }
-
   Widget _buildPublicarButton(){
     if(!jaPossuiJogo){
       return ElevatedButton(
         onPressed: () async {
-          publicar();
+          userController.publicar(matchLocalController.text, matchDataController.text, nMax, matchTimeController.text, context);
         },
         child: const Text('Publicar',
           style: TextStyle(

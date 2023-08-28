@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:firula_app/models/match.dart';
+import 'package:firula_app/model/MatchModel.dart';
 
 class ListGameItem extends StatelessWidget {
   ListGameItem({Key? key, required this.match, required this.onDelete}) : super(key: key);
 
-  final Match match;
+  final MatchModel match;
   final Function(Match) onDelete;
 
   @override

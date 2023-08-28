@@ -1,5 +1,5 @@
-import 'package:firula_app/pages/home.page.dart';
-import 'package:firula_app/pages/login.page.dart';
+import 'package:firula_app/view/home.page.dart';
+import 'package:firula_app/view/login.page.dart';
 import 'package:firula_app/services/auth_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
