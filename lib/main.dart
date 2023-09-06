@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firula_app/firebase_options.dart';
 import 'package:firula_app/provider/google_sign_in.dart';
@@ -32,7 +31,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [const Locale('pt', 'BR')],
       title: 'Firula',

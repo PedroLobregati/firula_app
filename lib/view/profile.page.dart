@@ -78,24 +78,24 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       );
                     },
-                        icon: const Icon(Icons.arrow_back_ios), color: Colors.white,),
+                      icon: const Icon(Icons.arrow_back_ios), color: Colors.white,),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.black,
-                      side: BorderSide(color: Colors.lightGreen)),
-                        onPressed: () async {
-                          showAlertDialog(context);
-                        },
-                        child: Text('Sair', style: TextStyle(
-                          fontWeight: FontWeight.w100,
-                          color: Colors.lightGreen,
-                        ),),
+                          side: BorderSide(color: Colors.lightGreen)),
+                      onPressed: () async {
+                        showAlertDialog(context);
+                      },
+                      child: Text('Sair', style: TextStyle(
+                        fontWeight: FontWeight.w100,
+                        color: Colors.lightGreen,
+                      ),),
                     ),
                   ],
                 ),
                 SizedBox(height: 265,),
 
                 Text("${user?.displayName!}", style: TextStyle(fontSize: 30, color: Colors.white,
-                fontWeight: FontWeight.bold,),),
+                  fontWeight: FontWeight.bold,),),
 
 
                 SingleChildScrollView(
@@ -130,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                           Padding(
                             padding: const EdgeInsets.only(top:8.0),
-                              
+
                             child: Text(userModel?.email == null ? " " : userModel!.email,
                               style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),
                             ),
@@ -167,9 +167,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(height: 62.5,),
                 TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.black,
-                  ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.black,
+                    ),
                     onPressed: () async {
                       userController.salvarAlteracoes(changedLoc, changedPos, _localizController.text, _posController.text);
                     },
@@ -187,12 +187,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   sair() async {
     await _firebaseAuth.signOut().then(
-            (user)=> Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-            builder: (context) => LoginPage(),
-            ),
-            ),
+          (user)=> Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ),
+      ),
     );
   }
 
@@ -218,12 +218,12 @@ class _ProfilePageState extends State<ProfilePage> {
         sair();
         //final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
         //provider.googleLogout().then(
-              //(user)=> Navigator.pushReplacement(
-            //context,
-            //MaterialPageRoute(
-              //builder: (context) => LoginPage(),
-            //),
-          //),
+        //(user)=> Navigator.pushReplacement(
+        //context,
+        //MaterialPageRoute(
+        //builder: (context) => LoginPage(),
+        //),
+        //),
         //);
       },
     );

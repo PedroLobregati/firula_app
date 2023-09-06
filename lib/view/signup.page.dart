@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firula_app/controller/UserController.dart';
-import 'package:firula_app/view/login.page.dart';
 import 'package:flutter/material.dart';
-
 
 class SignupPage extends StatefulWidget {
   @override
@@ -17,173 +15,93 @@ class _SignupPageState extends State<SignupPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  var _password = '';
-  var _confirmPassword = '';
-  var _name = null;
   final database = FirebaseDatabase.instance.ref();
-
   final _firebaseAuth = FirebaseAuth.instance;
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: Scaffold(
         body: Container(
-          padding: EdgeInsets.only(top: 10, left: 40, right: 40),
-          color: Color(0xff646660),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.center,
+              colors: [Colors.green, Colors.white],
+            ),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 40),
           child: ListView(
             children: <Widget>[
-              Container(
+              SizedBox(
                 width: 200,
                 height: 160,
-                alignment: Alignment(0.0, 1.15),
-                decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                    image: AssetImage("assets/images/logo.png"),
-                    fit: BoxFit.fitHeight,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 13,
-              ),
-              TextFormField(
-                onChanged: (value){
-                  _name = value;
-                },
-                controller: _nameController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  labelText: "Nome",
-                  labelStyle: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: "E-mail",
-                  labelStyle: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
-
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                onChanged: (value){
-                  _password = value;
-                },
-                controller: _passwordController,
-                keyboardType: TextInputType.text,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Senha",
-                  labelStyle: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
-                style: TextStyle(fontSize: 20),
+                child: Image.asset("assets/images/logo.png"),
               ),
 
-              /* SizedBox(
-                height: 10,
-              ),*/
-
-              TextFormField(
-                onChanged: (value){
-                  _confirmPassword = value;
-                },
-                controller: _confirmPasswordController,
-                keyboardType: TextInputType.text,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Confirmar Senha",
-                  labelStyle: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                ),
-                style: TextStyle(fontSize: 20),
-              ),
-
-              SizedBox(
-                height: 40,
-              ),
+              SizedBox(height: 35),
+              buildTextFormField(_nameController, "Nome", TextInputType.text, Icons.person),
+              SizedBox(height: 10),
+              buildTextFormField(_emailController, "E-mail", TextInputType.emailAddress, Icons.email),
+              SizedBox(height: 10),
+              buildTextFormField(_passwordController, "Senha", TextInputType.text, Icons.lock, obscure: _obscurePassword, toggleObscure: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              }),
+              SizedBox(height: 10),
+              buildTextFormField(_confirmPasswordController, "Confirmar Senha", TextInputType.text, Icons.lock, obscure: _obscureConfirmPassword, toggleObscure: () {
+                setState(() {
+                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                });
+              }),
+              SizedBox(height: 45),
               Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                decoration: BoxDecoration(
-                  color: Color(0xffC3EC37),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5),
-                  ),
-                ),
-                child: SizedBox.expand(
-                  child: TextButton(
-                    child: Text(
-                      "Cadastrar",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                      textAlign: TextAlign.center,
+                height: 50,
+                width: 50,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    userController.cadastrar(
+                      _emailController.text, _passwordController.text,
+                      _confirmPasswordController.text, _nameController.text,
+                      context,
+                    );
+                    try {
+                      print('Written successfully');
+                    } catch (e) {
+                      print('You got an error!');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green[700],
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    onPressed: () async {
-                      userController.cadastrar(_emailController.text, _passwordController.text, _confirmPasswordController.text, _nameController.text, context);
-                      try{
-                        print('Written successfully');
-                      }catch(e) {
-                        print('You got an error!');
-                      }
-                    },
+                  ),
+                  child: Text(
+                    "Cadastrar",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
                   ),
                 ),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
               Container(
                 height: 40,
-                alignment: Alignment.center,
                 child: TextButton(
                   child: Text(
                     "Cancelar",
-                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
                   onPressed: () => Navigator.pop(context, false),
                 ),
@@ -193,7 +111,36 @@ class _SignupPageState extends State<SignupPage> {
         ),
       ),
     );
-
   }
 
+  TextFormField buildTextFormField(TextEditingController controller, String label, TextInputType type, IconData icon, {bool obscure = false, Function? toggleObscure}) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: type,
+      obscureText: obscure,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon),
+        labelText: label,
+        labelStyle: TextStyle(
+          color: Colors.black38,
+          fontWeight: FontWeight.w500,
+          fontSize: 20,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        suffixIcon: toggleObscure != null
+            ? IconButton(
+          icon: Icon(
+            obscure ? Icons.visibility : Icons.visibility_off,
+            color: Colors.grey,
+          ),
+          onPressed: toggleObscure as void Function()?,  // Casting the function type here
+        )
+            : null,
+      ),
+      style: TextStyle(fontSize: 18),
+    );
+  }
 }
+

@@ -38,14 +38,19 @@ class _HomePageState extends State<HomePage> {
   }
   late StreamSubscription _match;
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: Container(
-          color: Color(0xffE1FFA4),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.center,
+              colors: [Colors.green, Colors.white],
+            ),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -67,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                           size: 55,
                         ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xffE1FFA4),
+                        //backgroundColor: Colors.transparent,
                         shape: CircleBorder(),
                         side: const BorderSide(
                           width: 1.0,
@@ -77,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(
                       width: 220,
-                      height: 75,
+                      height: 100,
                       child: Image.asset("assets/images/logo.png"),
                     ),
 
