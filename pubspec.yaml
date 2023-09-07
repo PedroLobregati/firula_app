@@ -36,11 +36,14 @@ dependencies:
   flutter_map: ^5.0.0
   google_maps_flutter: ^2.0.6
   geocoding: ^2.0.0
+  firebase_storage: ^11.2.6
+  image_picker: ^0.8.4
   easy_search_bar: ^2.4.2
   get:
   provider: ^6.0.5
   firebase_core: ^2.4.1
   firebase_auth: ^4.2.5
+  flutter_custom_clippers: ^2.1.0
   firebase_database: ^10.0.9
   google_sign_in:
   font_awesome_flutter:

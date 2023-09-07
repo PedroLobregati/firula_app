@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firula_app/view/creategame.page.dart';
 import 'package:firula_app/view/home.page.dart';
+import 'package:firula_app/view/profile.page.dart';
 import 'package:firula_app/view/user.profile.page.dart';
 import 'package:flutter/material.dart';
 
@@ -25,131 +26,128 @@ class _HomeMyGamesState extends State<HomeMyGames> {
   final TextEditingController searchController = TextEditingController();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
+
   late StreamSubscription _match;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          color: Color(0xffE1FFA4),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          children: [
+            // Gradient Background
+            Positioned(
+              top: -MediaQuery
+                  .of(context)
+                  .size
+                  .height / 4,
+              child: Container(
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height / 2,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Colors.green, Colors.lightGreen.shade200],
+                  ),
+                ),
+              ),
+            ),
+            // Logo at the top center
+            Positioned(
+              top: 10,
+              right: 0,
+              left: 20,
+              child: Image.asset('assets/images/logo.png', height: 125),
+            ),
+            // Create Game and Profile buttons
+            Positioned(
+              top: 30,
+              left: 15,
+              child: _buildCircleButton(
+                icon: Icons.add_circle_outline,
+                label: 'Criar Jogo',
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateGame()),
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              top: 34,
+              right: 15,
+              child: _buildCircleButton(
+                icon: Icons.person,
+                label: 'Perfil',
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                  );
+                },
+              ),
+            ),
+            Column(
               children: [
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreateGame(),
-                          ),
-                        );
-                      },
-                      child: Icon(
-                        Icons.add,
-                        size: 55,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xffE1FFA4),
-                        shape: CircleBorder(),
-                        side: const BorderSide(
-                          width: 1.0,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 220,
-                      height: 75,
-                      child: Image.asset("assets/images/logo.png"),
-                    ),
-                    IconButton(
-                      onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.person,
-                        size: 85,
-                      ),
-                      padding: EdgeInsets.only(bottom: 50),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: const [
-                    SizedBox(width: 9,),
-                    Text('Criar jogo',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    SizedBox(width: 245,),
-                    Text('Perfil',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30,),
-
+                SizedBox(height: 150), // Ajuste o valor conforme necessário
                 Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white70,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(30),
                     border: Border.all(
                       color: Colors.black,
                       width: 1.0,
                     ),
                   ),
-                  child: TextField(controller: searchController,
-                    decoration:  InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon:
-                      searchBarInUse? IconButton(onPressed: (){
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        searchController.clear();
-                        setState(() {
-                          searchBarInUse = false;
-                        });
-                      }, icon: const Icon(Icons.cancel)): null,
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      suffixIcon: searchBarInUse
+                          ? IconButton(
+                        onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          searchController.clear();
+                          setState(() {
+                            searchBarInUse = false;
+                          });
+                        },
+                        icon: Icon(Icons.cancel),
+                      )
+                          : null,
                       hintText: "Pesquisar usuários...",
                       border: InputBorder.none,
                     ),
-                    onTap: (){},
-                    onChanged: (String text){
+                    onTap: () {},
+                    onChanged: (String text) {
                       setState(() {
                         search = text;
                         searchBarInUse = true;
                       });
                     },
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey,
+                      color: Colors.black,
                     ),
                   ),
                 ),
-
+                SizedBox(height: 0),
                 _buildSearch(),
-                const SizedBox(height: 10,),
-
+                SizedBox(height: 7),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -159,25 +157,28 @@ class _HomeMyGamesState extends State<HomeMyGames> {
                         padding: const EdgeInsets.only(left: 12, right: 12),
                         decoration: const BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(width: 4,
+                            bottom: BorderSide(
+                              width: 4,
                               color: Colors.grey,
                             ),
                           ),
                         ),
                         child: TextButton(
-                          onPressed: ((){
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const HomePage(),
+                                builder: (context) => HomePage(),
                               ),
                             );
-                          }),
-                          child: const Text('Explorar',
+                          },
+                          child: const Text(
+                            'Explorar',
                             style: TextStyle(
                               fontSize: 16,
                               color: Color(0xff036C00),
-                            ),),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -186,32 +187,38 @@ class _HomeMyGamesState extends State<HomeMyGames> {
                         padding: const EdgeInsets.only(left: 12, right: 12),
                         decoration: const BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(width: 4,
+                            bottom: BorderSide(
+                              width: 4,
                               color: Color(0xff699708),
                             ),
                           ),
                         ),
                         child: TextButton(
-                            onPressed: (){
-                            },
-                            child: const Text('Meus jogos',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff036C00),
-                              ),)),
+                          onPressed: (() {}),
+                          child: const Text(
+                            'Meus Jogos',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xff036C00),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20,),
+                StreamBuilder(
 
-                StreamBuilder(stream:
-                _database.child('FirulaData/users/${user!.uid}/solicitParticip').orderByKey().limitToLast(10).onValue,
-                    builder: (context, snapshot){
-                      final tileList = <ListTile>[];
-                      if(snapshot.data?.snapshot.value != null) {
+                    stream: _database
+                        .child('FirulaData/users/${user!.uid}/solicitParticip')
+                        .orderByKey()
+                        .limitToLast(10)
+                        .onValue,
+                    builder: (context, snapshot) {
+                      final tileList = <Widget>[];
+                      if (snapshot.data?.snapshot.value != null) {
                         final mySolicit = Map<String, dynamic>.from(
                             snapshot.data!.snapshot.value as dynamic);
                         mySolicit.forEach((key, value) {
@@ -220,85 +227,131 @@ class _HomeMyGamesState extends State<HomeMyGames> {
                           String data = next['matchData'] as String;
                           String situacao = next['situation'] as String;
                           final orderTile = ListTile(
-                            leading: situacao == "Na lista!" ? const Icon(Icons.check_circle, size: 30, color: Colors.green,) : situacao == 'Aguardando resposta...' ? const Icon(Icons.watch_later, size: 30,) : const Icon(Icons.cancel, size: 30, color: Colors.red,),
-                            onTap: () {
-                            },
+                            leading: situacao == "Na lista!" ? const Icon(
+                              Icons.check_circle, size: 30,
+                              color: Colors.green,) : situacao ==
+                                'Aguardando resposta...' ? const Icon(
+                              Icons.watch_later, size: 30,) : const Icon(
+                              Icons.cancel, size: 30, color: Colors.red,),
+                            onTap: () {},
                             title: Text("$local ($data)",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-
-                              ),),
-                            );
+                              ),
+                            ),
+                          );
                           tileList.add(orderTile);
+                          tileList.add(Divider(thickness: 1.5, color: Colors.black));
                         });
                       }
                       return Expanded(
                         child: ListView(
-                          children:
-                          tileList,
+                          children: tileList,
                         ),
                       );
                     }
                 ),
-
               ],
-
-
             ),
-          ),
+          ],
         ),
       ),
-
     );
   }
+
+
   @override
-  void deactivate(){
+  void deactivate() {
     _match.cancel();
     super.deactivate();
-
   }
 
-  Widget _buildSearch(){
+  Widget _buildCircleButton(
+      {required IconData icon, required String label, required VoidCallback onPress}) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 24,
+          backgroundColor: Colors.white,
+          child: IconButton(
+            icon: Icon(icon, size: 24),
+            onPressed: onPress,
+          ),
+        ),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),  // Estilo adicionado aqui
+        ),
+      ],
+    );
+  }
 
-    if(searchBarInUse == true){
+
+
+  Widget _buildSearch() {
+    if (searchBarInUse == true) {
       return Expanded(
         child: FirebaseAnimatedList(
           query: _database.child('FirulaData/users'),
-          itemBuilder: (BuildContext context, DataSnapshot snapshot, Animation<double> animation, int index) {
+          itemBuilder: (BuildContext context, DataSnapshot snapshot,
+              Animation<double> animation, int index) {
             var data = snapshot.value as Map?;
             String tempTitle = data!['nome'];
-            String tempId = data['id'];
-            if(searchController.text.isEmpty){
+            String tempId = snapshot.key!;
+            if (searchController.text.isEmpty) {
               return SizedBox(height: 1,);
             }
-            else if (tempTitle.contains(searchController.text.toString())){
-              return ElevatedButton.icon(onPressed: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserProfilePage(userId: tempId,),
+            else if (tempTitle.contains(searchController.text.toString())) {
+              return Column(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              UserProfilePage(userId: tempId,),
+                        ),
+                      );
+                    },
+                    icon: CircleAvatar(
+                      backgroundColor: Colors.black,
+                      // Defina a cor de fundo do círculo aqui
+                      child: Icon(Icons.person, size: 18,
+                        color: Colors.white,), // Defina a cor do ícone aqui
+                    ),
+                    label: Text(
+                      tempTitle,
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w200),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white70,
+                      minimumSize: Size(150,
+                          50), // Ajuste a largura e altura conforme necessário
+                    ),
                   ),
-                );
-              },
-                icon: Icon(Icons.person, size: 14,),
-                label: Text(tempTitle,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w200),),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white70,
-                ),);
+                  Container(
+                    height: 10, // Ajuste a altura conforme necessário
+                    color: Colors
+                        .white, // Defina a cor do bloco de separação aqui
+                  ),
+                  // Você pode copiar e colar um bloco semelhante de ElevatedButton.icon aqui para adicionar mais botões
+                ],
+              );
             }
-            else{
-              return SizedBox(height: 1,);
+            else {
+              return SizedBox(height: 2,);
             }
           },),
-      );}
+      );
+    }
     else {
       return const SizedBox(height: 10,);
     }
-
   }
 
 }
-
 

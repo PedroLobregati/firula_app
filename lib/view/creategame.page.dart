@@ -42,133 +42,147 @@ class _CreateGameState extends State<CreateGame> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.green, Colors.white],
+        body: Stack(
+          children: [
+            Positioned(
+              top: -MediaQuery.of(context).size.height / 4,
+              child: Container(
+                height: MediaQuery.of(context).size.height / 2,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Colors.green, Colors.lightGreen.shade200],
+                  ),
+                ),
+              ),
             ),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 35),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ListView(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                        padding: EdgeInsets.only(left: 10.0), // Ajuste aqui conforme necessário
-                        constraints: BoxConstraints(),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.black,
-                        )),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                _buildTextFormField(
-                    matchLocalController, "Local", TextInputType.text,
-                    Icons.place),
-                const SizedBox(
-                  height: 10,
-                ),
-                _buildTextFormField(
-                  matchDataController,
-                  "Data",
-                  TextInputType.datetime,
-                  Icons.calendar_month_rounded,
-                  onTap: () async {
-                    DateTime? date = DateTime(1900);
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                    date = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                    );
-                    if (date != null) {
-                      String formattedDate = DateFormat(
-                          DateFormat.YEAR_NUM_MONTH_DAY, 'pt_Br').format(date);
-                      matchDataController.text = formattedDate;
-                    }
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                _buildTextFormField(
-                  matchTimeController,
-                  "Horário",
-                  TextInputType.text,
-                  Icons.watch_later,
-                  onTap: () async {
-                    TimeOfDay time = TimeOfDay.now();
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: time,
-                    );
-                    if (pickedTime != null) {
-                      matchTimeController.text =
-                          pickedTime.format(context).toString();
-                    }
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                _buildTextFormField(
-                  matchPlayersController,
-                  "Quantidade de jogadores",
-                  TextInputType.number,
-                  Icons.people,
-                  onEditingComplete: () {
-                    nMax = int.parse(matchPlayersController.text);
-                  },
-                ),
-                const SizedBox(
-                  height: 20, // Espaçamento aumentado
-                ),
-                Container(
-                  height: 250, // Altura do mapa aumentada
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 2),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: MapView(
-                      onLocationSelected: (LatLng latLng) async {
-                        String address =
-                        await userController.convertCoordinatesToAddress(
-                            latLng);
-                        matchLocalController.text = address;
-                      },
+            Positioned(
+              top: 10,
+              left: 10,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
                     ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 70), // Centralizado verticalmente com margens
+                padding: EdgeInsets.all(5.0),
+                height: MediaQuery.of(context).size.height * 1, // Ajustado o tamanho conforme solicitado
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      const SizedBox(height: 30),
+                      _buildTextFormField(
+                        matchLocalController,
+                        "Local",
+                        TextInputType.text,
+                        Icons.place,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextFormField(
+                        matchDataController,
+                        "Data",
+                        TextInputType.datetime,
+                        Icons.calendar_month_rounded,
+                        onTap: () async {
+                          DateTime? date = DateTime(1900);
+                          FocusScope.of(context).requestFocus(new FocusNode());
+                          date = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(Duration(days: 365)),
+                          );
+                          if (date != null) {
+                            String formattedDate = DateFormat(DateFormat.YEAR_NUM_MONTH_DAY, 'pt_Br').format(date);
+                            matchDataController.text = formattedDate;
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextFormField(
+                        matchTimeController,
+                        "Horário",
+                        TextInputType.text,
+                        Icons.watch_later,
+                        onTap: () async {
+                          TimeOfDay time = TimeOfDay.now();
+                          FocusScope.of(context).requestFocus(new FocusNode());
+                          TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: time,
+                          );
+                          if (pickedTime != null) {
+                            matchTimeController.text = pickedTime.format(context).toString();
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextFormField(
+                        matchPlayersController,
+                        "Quantidade de jogadores",
+                        TextInputType.number,
+                        Icons.people,
+                        onEditingComplete: () {
+                          nMax = int.parse(matchPlayersController.text);
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      Container(
+                        height: 250,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 2),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: MapView(
+                            onLocationSelected: (LatLng latLng) async {
+                              String address = await userController.convertCoordinatesToAddress(latLng);
+                              matchLocalController.text = address;
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 80),
+                    ],
                   ),
                 ),
-                const SizedBox(
-                  height: 80, // Espaçamento aumentado para afastar o botão "Publicar" do mapa
-                ),
-                Center(
+              ),
+            ),
+            Positioned(
+              bottom: 20,
+              left: MediaQuery.of(context).size.width * 0.05,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: Center(
                   child: _buildPublicarButton(),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -181,7 +195,7 @@ class _CreateGameState extends State<CreateGame> {
       controller: controller,
       keyboardType: type,
       style: TextStyle(color: Colors.black), // Cor do texto alterada para branco
-      cursorColor: Colors.white, // Cor do cursor alterada para branco
+      cursorColor: Colors.green, // Cor do cursor alterada para branco
       decoration: InputDecoration(
         fillColor: Colors.transparent,
         filled: true,
@@ -198,7 +212,7 @@ class _CreateGameState extends State<CreateGame> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.white), // Cor da borda focada alterada para branco
+          borderSide: BorderSide(color: Colors.green), // Cor da borda focada alterada para branco
         ),
       ),
       onTap: onTap as void Function()?,
@@ -230,11 +244,20 @@ class _CreateGameState extends State<CreateGame> {
         ),
       );
     } else {
-      return const Text(
-        "Você já possui um jogo criado!",
-        style: TextStyle(
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
           color: Colors.red,
-          fontSize: 16,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          "Você já possui um jogo criado!",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
         ),
       );
     }

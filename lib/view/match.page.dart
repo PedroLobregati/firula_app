@@ -6,6 +6,7 @@ import 'package:firula_app/services/UserService.dart';
 import 'package:firula_app/view/user.profile.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import '../model/MatchModel.dart';
 import 'home.page.dart';
 
@@ -48,168 +49,222 @@ class _MatchPageState extends State<MatchPage> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    queryData = MediaQuery.of(context);
     return SafeArea(
       child: Scaffold(
         body: Container(
-          height: queryData.size.height,
-          width: queryData.size.width,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/match3.jpg"),
-              fit: BoxFit.cover,
-              opacity: 100,
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter, // Modificado para atingir o topo da página
+              colors: [Colors.lightGreen.shade200, Colors.white],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-              Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+          child: Column(
+            children: [
+              ClipPath(
+                clipper: WaveClipper(),
+                child: Container(
+                  height: 150,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green, Colors.lightGreen.shade200],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              type: PageTransitionType.leftToRight,
+                              child: const HomePage(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.arrow_back_ios),
+                      Text(
+                        "Jogo de ${_matchData!.host}",
+                        style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
               ),
-                SizedBox(height: 20,),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
+              SizedBox(height: 20),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 350,
                         padding: EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.35),
+                          color: Colors.lightGreen.shade100,
+                          borderRadius: BorderRadius.circular(15.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.place),
-                                      SizedBox(width: 20,),
-                                      Text('${_matchData!.local}',
-                                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),),
-
-                                    ],
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.place),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: Text(
+                                    '${_matchData!.local}',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),
+                                    softWrap: true,
                                   ),
-
-                                  Row(
-                                    children: [
-                                      Icon(Icons.calendar_month_rounded),
-                                      SizedBox(width: 20,),
-                                      Text('${_matchData!.data}',
-                                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),),
-
-                                    ],
-                                  ),
-
-                                  Row(
-                                    children: [
-                                      Icon(Icons.watch_later),
-                                      SizedBox(width: 20,),
-                                      Text('${_matchData!.time}',
-                                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),),
-
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 40,),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                     Icon(Icons.stars),
-                     SizedBox(width: 6,),
-                     Text("Criado por: ${_matchData!.host}",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                  ],
-                ),
-                SizedBox(height: 45,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton.icon(onPressed: (){}, icon: Icon(Icons.checklist, color: Colors.black,), label: Text("Lista vigente", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Colors.black,),)),
-                    Text("   (${_matchData!.onList} / ${_matchData!.nPlayers})",
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.green),)
-                  ],
-                ),
-
-                StreamBuilder(stream:
-                _database.child('FirulaData/matches/${widget.matchId}/participants').orderByKey().limitToLast(10).onValue,
-                    builder: (context, snapshot) {
-                      final tileList = <ListTile>[];
-                      if(snapshot.hasData) {
-                        final participants = Map<String, dynamic>.from(
-                            snapshot.data!.snapshot.value as dynamic);
-                        participants.forEach((key, value) {
-                          final nextParticipant = Map<String, dynamic>.from(value);
-                          String userId = nextParticipant['userId'] as String;
-                          final orderTile = ListTile(
-                            leading: const Icon(Icons.person, size: 26,),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UserProfilePage(userId: userId,),
                                 ),
-                              );
-                            },
-                            title: Text("${nextParticipant['username']}",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),),
-                          );
-                          tileList.add(orderTile);
-                        });
-                      }
-                      return Expanded(
-                        child: ListView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          children:
-                          tileList,
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.calendar_month_rounded),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: Text(
+                                    '${_matchData!.data}',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.watch_later),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: Text(
+                                    '${_matchData!.time}',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      );
-                    }
+                      ),
+                    ],
+                  ),
                 ),
-
-                _buildButton(),
-              ],
-            ),
+              ),
+              SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.green,
+                    child: Icon(Icons.person, color: Colors.white),
+                  ),
+                  SizedBox(width: 6),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Criado por: ${_matchData!.host}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 45),
+              Expanded(
+                child: Container(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {},
+                            icon: Icon(Icons.checklist, color: Colors.black),
+                            label: Text("Lista vigente", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Colors.black)),
+                          ),
+                          Text(
+                            "   (${_matchData!.onList} / ${_matchData!.nPlayers})",
+                            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.green),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: StreamBuilder(
+                          stream: _database.child('FirulaData/matches/${widget.matchId}/participants').orderByKey().limitToLast(10).onValue,
+                          builder: (context, snapshot) {
+                            final tileList = <ListTile>[];
+                            if (snapshot.hasData) {
+                              final participants = Map<String, dynamic>.from(snapshot.data!.snapshot.value as dynamic);
+                              participants.forEach((key, value) {
+                                final nextParticipant = Map<String, dynamic>.from(value);
+                                String userId = nextParticipant['userId'] as String;
+                                final orderTile = ListTile(
+                                  leading: const Icon(Icons.person, size: 26),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => UserProfilePage(userId: userId),
+                                      ),
+                                    );
+                                  },
+                                  title: Text(
+                                    "${nextParticipant['username']}",
+                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                  ),
+                                );
+                                tileList.add(orderTile);
+                              });
+                            }
+                            return ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              children: tileList,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-
+        bottomNavigationBar: SizedBox(
+          height: 100,
+          child: Center(
+            child: _buildButton(),
+          ),
+        ),
       ),
     );
   }
+
+
   Widget _buildButton(){
     if(user!.uid == _matchData!.hostId){
       return Padding(
-        padding: const EdgeInsets.only(top: 30),
+        padding: const EdgeInsets.only(top: 0),
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xffD03838)),
@@ -288,12 +343,6 @@ class _MatchPageState extends State<MatchPage> {
     );
   }
 
-
-
-
-
-
-
   void alreadyClicked(){
     _database.child('FirulaData/users/${user!.uid}/solicitParticip/${widget.matchId}/situation').once().then((DatabaseEvent event) {
       print(event.snapshot.value);
@@ -303,6 +352,35 @@ class _MatchPageState extends State<MatchPage> {
         });
       }
     });
+  }
+}
+
+class WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    path.lineTo(0, size.height - 20);
+
+    var firstControlPoint = Offset(size.width / 4, size.height);
+    var firstEndPoint = Offset(size.width / 2.25, size.height - 30);
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
+        firstEndPoint.dx, firstEndPoint.dy);
+
+    var secondControlPoint =
+    Offset(size.width - (size.width / 3.25), size.height - 65);
+    var secondEndPoint = Offset(size.width, size.height - 40);
+    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
+        secondEndPoint.dx, secondEndPoint.dy);
+
+    path.lineTo(size.width, size.height - 40);
+    path.lineTo(size.width, 0);
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return false;
   }
 }
 
