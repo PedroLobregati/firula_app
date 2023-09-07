@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../controller/UserController.dart';
-
+import 'home.page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,16 +13,13 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _firebaseAuth = FirebaseAuth.instance;
   final userController = UserController();
 
-
   bool _isObscured = true; // Declarado aqui
-
 
   @override
   Widget build(BuildContext context) {
@@ -187,8 +184,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-
   String? emailVazio(String? value){
     if (value == null || value.isEmpty)
       return 'Email não preenchido';
@@ -196,4 +191,3 @@ class _LoginPageState extends State<LoginPage> {
       return null;
   }
 }
-

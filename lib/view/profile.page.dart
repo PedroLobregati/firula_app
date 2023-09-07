@@ -1,5 +1,4 @@
 import 'dart:async';
-// EDITADO 0307
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:provider/provider.dart';
@@ -34,10 +33,11 @@ class _ProfilePageState extends State<ProfilePage> {
   UserModel? userModel;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     userController.carregarInfoPerfil(_onDataReceived);
   }
+
   late StreamSubscription _user;
 
   void _onDataReceived(UserModel userData) {
@@ -50,198 +50,231 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
+
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        body: SingleChildScrollView(
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/FirulaCarta.png"),
-                fit: BoxFit.cover,
-                opacity: 1,
+        body: Stack(
+          children: [
+            ClipPath(
+              clipper: MyClipper(),
+              child: Container(
+                height: 250.0,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.green, Colors.lightGreen.shade200],
+                    ),
+                  )
               ),
             ),
-
-            padding: EdgeInsets.all(8.0),
-
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(onPressed: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomePage(),
+            Positioned(
+              top: 100.0,
+              left: queryData.size.width / 2 - 90.0,
+              child: CircleAvatar(
+                radius: 90.0,
+                backgroundColor: Colors.white,
+                child: CircleAvatar(
+                  radius: 82.0,
+                  backgroundImage: AssetImage('assets/path/to/your/image.jpg'), // add your image asset here
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 28.0,
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.green,
+                        size: 30.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 35),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_back_ios),
+                        color: Colors.black,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.white, // Botão colorido
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50), // Botão arredondado
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Padding
                         ),
-                      );
-                    },
-                        icon: const Icon(Icons.arrow_back_ios), color: Colors.white,),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.black,
-                      side: BorderSide(color: Colors.lightGreen)),
                         onPressed: () async {
                           showAlertDialog(context);
                         },
-                        child: Text('Sair', style: TextStyle(
-                          fontWeight: FontWeight.w100,
-                          color: Colors.lightGreen,
-                        ),),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 265,),
-
-                Text("${user?.displayName!}", style: TextStyle(fontSize: 30, color: Colors.white,
-                fontWeight: FontWeight.bold,),),
-
-
-                SingleChildScrollView(
-                  child: Stack(
-                    children: [Padding(
-                      padding: const EdgeInsets.only(left: 170),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 50, top: 3.0),
-                            child: TextFormField(
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                              controller: _posController,
-                              onFieldSubmitted: (String empty){
-                                displaypos = _posController.text;
-                                changedPos = true;
-                              },
-                              decoration: InputDecoration(
-                                floatingLabelBehavior: FloatingLabelBehavior.never,
-                                labelText: userModel!.pos == '' ? "Definir posição..." : userModel!.pos,
-                                labelStyle: TextStyle(
-                                  fontSize: 17.5,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                        child: Text(
+                          'Sair',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
                           ),
-
-                          Padding(
-                            padding: const EdgeInsets.only(top:8.0),
-                              
-                            child: Text(userModel?.email == null ? " " : userModel!.email,
-                              style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-
-
-                          Padding(
-                            padding: EdgeInsets.only(left: 50, top: 10),
-                            child: TextFormField(
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                              controller: _localizController,
-                              onFieldSubmitted: (String empty){
-                                displayloc = _localizController.text;
-                                changedLoc = true;
-                              },
-                              decoration: InputDecoration(
-                                floatingLabelBehavior: FloatingLabelBehavior.never,
-                                labelText: userModel!.localiz== '' ? "Definir localização..." : userModel!.localiz,
-                                labelStyle: TextStyle(
-                                  fontSize: 17.5,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        ],
+                        ),
                       ),
-                    )],
+                    ],
                   ),
-                ),
-                SizedBox(height: 62.5,),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.black,
+                  SizedBox(height: 225),
+                  Text(
+                    "${user?.displayName!}",
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  SizedBox(height: 20),
+                  TextFieldContainer(
+                    child: TextField(
+                      controller: TextEditingController(text: user?.email),
+                      enabled: false,
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.email, color: Colors.green),
+                        hintText: "Email",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  TextFieldContainer(
+                    child: TextField(
+                      controller: _localizController,
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.location_on, color: Colors.green),
+                        hintText: "Localização",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  TextFieldContainer(
+                    child: TextField(
+                      controller: _posController,
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.sports_soccer, color: Colors.green),
+                        hintText: "Posição",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 90),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.green, // Botão colorido
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50), // Botão arredondado
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 70, vertical: 15), // Padding
+                    ),
                     onPressed: () async {
                       userController.salvarAlteracoes(changedLoc, changedPos, _localizController.text, _posController.text);
                     },
-                    child: const Text('Salvar alterações',
-                      style: TextStyle(fontSize: 15),)),
-
-              ],
+                    child: Text(
+                      'Salvar Alterações',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-
-  sair() async {
-    await _firebaseAuth.signOut().then(
-            (user)=> Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-            builder: (context) => LoginPage(),
-            ),
-            ),
-    );
-  }
-
-  @override
-  void deactivate(){
-    _user.cancel();
-    super.deactivate();
-  }
-
-  showAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: Text("Voltar", style: TextStyle(fontWeight: FontWeight.bold),),
-      onPressed:  () {
-        Navigator.pop(context);
-      },
-    );
-    Widget continueButton = TextButton(
-      child: const Text("Logout", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-      onPressed:  () async {
-        final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-        provider.googleLogout();
-        sair();
-        //final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-        //provider.googleLogout().then(
-              //(user)=> Navigator.pushReplacement(
-            //context,
-            //MaterialPageRoute(
-              //builder: (context) => LoginPage(),
-            //),
-          //),
-        //);
-      },
-    );
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Confirmação"),
-      content: Text("Deseja fazer logout?"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-    // show the dialog
+  void showAlertDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return AlertDialog(
+          title: new Text("Sair"),
+          content: new Text("Você tem certeza que deseja sair?"),
+          actions: <Widget>[
+            new TextButton(
+              child: new Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new TextButton(
+              child: new Text("Sim"),
+              onPressed: () {
+                final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+                provider.googleLogout();
+                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
+              },
+            ),
+          ],
+        );
       },
+    );
+  }
+}
+
+class MyClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = new Path();
+    path.lineTo(0, size.height - 50);
+    var controlPoint = Offset(50, size.height);
+    var endPoint = Offset(size.width / 2, size.height);
+    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    controlPoint = Offset(size.width - 50, size.height);
+    endPoint = Offset(size.width, size.height - 50);
+    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    return true;
+  }
+}
+
+class TextFieldContainer extends StatelessWidget {
+  final Widget child;
+
+  const TextFieldContainer({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      width: size.width * 0.8,
+      decoration: BoxDecoration(
+        color: Colors.green[100],
+        borderRadius: BorderRadius.circular(29),
+      ),
+      child: child,
     );
   }
 }

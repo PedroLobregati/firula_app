@@ -9,12 +9,34 @@ import '../model/UserModel.dart';
 import '../services/UserService.dart';
 import '../view/home.page.dart';
 import '../view/login.page.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:geocoding/geocoding.dart';
+
 
 class UserController {
   final _firebaseAuth = FirebaseAuth.instance;
   final database = FirebaseDatabase.instance.ref();
   User? user = FirebaseAuth.instance.currentUser;
   final userService = UserService();
+
+
+  Future<String> convertCoordinatesToAddress(LatLng latLng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        String address = "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        return address;
+      } else {
+        return "Nenhum endereço associado a essas coordenadas.";
+      }
+    } catch (e, stacktrace) {
+      print(e);
+      print(stacktrace);
+      return "Erro durante a conversão de coordenadas para endereço: $e";
+    }
+  }
 
   void cadastrar(email, senha, confirmarSenha, nome, context) async {
     bool checkSign = true;
