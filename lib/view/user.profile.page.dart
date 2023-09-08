@@ -45,7 +45,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         child: Column(
           children: [
             Container(
-              height: MediaQuery.of(context).size.height / 2,
               child: Row(
                 children: [
                   Expanded(
@@ -127,7 +126,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  void _activateListeners(){
+  void _activateListeners() async{
     _user = _database.child('FirulaData/users/${widget.userId}/nome').onValue.listen((event) {
       final String nome = event.snapshot.value as String;
       print("Nome: $nome");  // Adicionando uma instrução print para verificar se o nome está sendo recebido corretamente

@@ -22,14 +22,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final _firebaseAuth = FirebaseAuth.instance;
   User? user = FirebaseAuth.instance.currentUser;
   final userController = UserController();
-  String displayname = '';
-  String displayemail = '';
-  String displayloc = '';
-  String displaypos = '';
   final _localizController = TextEditingController();
   final _posController = TextEditingController();
-  bool changedLoc = false;
-  bool changedPos = false;
   UserModel? userModel;
 
   @override
@@ -43,6 +37,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onDataReceived(UserModel userData) {
     setState(() {
       userModel = userData;
+      _localizController.text = userModel!.localiz!;
+      _posController.text = userModel!.pos!;
     });
   }
 
@@ -159,7 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       controller: _localizController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.location_on, color: Colors.green),
-                        hintText: "Localização",
+                        hintText: userModel!.localiz== '' ? "Localização" : userModel!.localiz,
                         border: InputBorder.none,
                       ),
                     ),
@@ -169,7 +165,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       controller: _posController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.sports_soccer, color: Colors.green),
-                        hintText: "Posição",
+                        hintText: userModel!.pos == '' ? "Posição" : userModel!.pos,
                         border: InputBorder.none,
                       ),
                     ),
@@ -184,7 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: EdgeInsets.symmetric(horizontal: 70, vertical: 15), // Padding
                     ),
                     onPressed: () async {
-                      userController.salvarAlteracoes(changedLoc, changedPos, _localizController.text, _posController.text);
+                      userController.salvarAlteracoes(_localizController.text, _posController.text);
                     },
                     child: Text(
                       'Salvar Alterações',
@@ -220,10 +216,18 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             new TextButton(
               child: new Text("Sim"),
-              onPressed: () {
+              onPressed: () async {
                 final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
                 provider.googleLogout();
                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
+                await _firebaseAuth.signOut().then(
+                      (user)=> Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginPage(),
+                    ),
+                  ),
+                );
               },
             ),
           ],

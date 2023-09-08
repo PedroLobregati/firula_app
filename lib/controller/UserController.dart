@@ -228,20 +228,12 @@ class UserController {
       });
   }
 
-  void salvarAlteracoes(bool changedLoc, bool changedPos, String localizController, String posController){
+  void salvarAlteracoes(String localizController, String posController){
     User? user = FirebaseAuth.instance.currentUser;
-    if(changedLoc == true && changedPos == false){
-      final profileData = database.child('FirulaData/users/${user!.uid}').update(
-          {'localiz': localizController});
-    }
-    else if(changedLoc == false && changedPos == true){
-      final profileData = database.child('FirulaData/users/${user!.uid}').update(
-          {'pos': posController});
-    }
-    else if (changedLoc == true && changedPos == true){
+
       final profileData = database.child('FirulaData/users/${user!.uid}').update(
           {'localiz': localizController, 'pos': posController});
-    }
+
   }
 
 }
