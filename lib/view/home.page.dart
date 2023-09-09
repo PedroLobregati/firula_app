@@ -31,11 +31,12 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
   String search = '';
   bool searchBarInUse = false;
-
+  //bool carregamento
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
+
   late StreamSubscription _match;
 
   @override
@@ -270,39 +271,39 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: StreamBuilder(
-                    stream: _database.child('FirulaData/users/${user!.uid}/received').orderByKey().limitToLast(10).onValue,
-                    builder: (context, snapshot) {
-                      int notificacao = 0;
-                      if (snapshot.data?.snapshot.value != null) {
-                        print("SNAPSHOT: $snapshot");
-                        print("SNAPSHOT.DATA: ${snapshot.data?.snapshot.value}");
-                        final myNotifications = Map<String, dynamic>.from(
-                            snapshot.data!.snapshot.value as dynamic);
-                        myNotifications.forEach((key, value) {
-                          notificacao++;
-                        });
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 5.0), // Ajuste o valor de 'top' conforme necessário
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            badges.Badge(
-                              badgeContent: Text('$notificacao',
-                                  style: const TextStyle(color: Colors.white)),
-                              child: Icon(Icons.notifications, size: 42,),
-                              badgeStyle: BadgeStyle(badgeColor: Colors.green),
-                              onTap: () {
-                                Navigator.push(context,
-                                    PageTransition(
-                                        type: PageTransitionType.rightToLeft,
-                                        child: const NotificationPage()));
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
+                      stream: _database.child('FirulaData/users/${user?.uid}/received').orderByKey().limitToLast(10).onValue,
+                      builder: (context, snapshot) {
+                        int notificacao = 0;
+                        if (snapshot.data?.snapshot.value != null) {
+                          print("SNAPSHOT: $snapshot");
+                          print("SNAPSHOT.DATA: ${snapshot.data?.snapshot.value}");
+                          final myNotifications = Map<String, dynamic>.from(
+                              snapshot.data!.snapshot.value as dynamic);
+                          myNotifications.forEach((key, value) {
+                            notificacao++;
+                          });
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 5.0), // Ajuste o valor de 'top' conforme necessário
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              badges.Badge(
+                                badgeContent: Text('$notificacao',
+                                    style: const TextStyle(color: Colors.white)),
+                                child: Icon(Icons.notifications, size: 42,),
+                                badgeStyle: BadgeStyle(badgeColor: Colors.green),
+                                onTap: () {
+                                  Navigator.push(context,
+                                      PageTransition(
+                                          type: PageTransitionType.rightToLeft,
+                                          child: const NotificationPage()));
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                 ),
               ],
             ),
@@ -312,12 +313,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   @override
   void deactivate(){
     _match.cancel();
     super.deactivate();
-
   }
 
   Widget _buildCircleButton(
@@ -340,7 +339,6 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
 
   Widget _buildSearch(){
     if(searchBarInUse == true){
@@ -396,8 +394,8 @@ class _HomePageState extends State<HomePage> {
     else {
       return const SizedBox(height: 10,);
     }
-
   }
+
   Future<void> refreshPage() async {
     DateTime dataHoje = DateTime.now();
     TimeOfDay horarioAtual = TimeOfDay.now();
@@ -405,9 +403,9 @@ class _HomePageState extends State<HomePage> {
     final ref = FirebaseDatabase.instance.ref().child('FirulaData/matches/').orderByKey();
     ref.get().then((snapshot) {
       for (final data in snapshot.children) {
-        String dataJogo = data.child("data").value as String;
-        String horaJogo = data.child("time").value as String;
-        String hostId = data.child("hostId").value as String;
+        String dataJogo = data.child("data").value as String? ?? 'Data não definida';
+        String horaJogo = data.child("time").value as String? ?? 'Horário não definido';
+        String hostId = data.child("hostId").value as String? ?? 'Anfitrião não definido';
 
         var horaJogoParsed = TimeOfDay(hour:int.parse(horaJogo.split(":")[0]),minute: int.parse(horaJogo.split(":")[1]));
         var dataJogoParsed = DateFormat('d/M/y').parse(dataJogo);
@@ -424,15 +422,10 @@ class _HomePageState extends State<HomePage> {
             _database.child('FirulaData/matches/${data.key}').remove();
             _database.child('FirulaData/users/$hostId').update(
                 {'possuiJogoCriado': false});
-
           }
         }
       }
     });
     return Future.delayed(Duration(seconds: 2));
   }
-
-
-
-
 }

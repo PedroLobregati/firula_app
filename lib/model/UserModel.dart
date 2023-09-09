@@ -3,9 +3,9 @@ import 'package:firebase_database/firebase_database.dart';
 import './NotificationModel.dart';
 class UserModel {
   final String nome, email;
-  final String? localiz, pos;
+  late final String localiz, pos;
   final bool possuiJogoCriado;
-  final List<NotificationModel>? notificacoes;
+  late final List<NotificationModel> notificacoes;
 
   UserModel({
     required this.nome,
@@ -13,8 +13,9 @@ class UserModel {
     required this.localiz,
     required this.pos,
     required this.possuiJogoCriado,
-    this.notificacoes,
-  });
+    List<NotificationModel>? notificacoes,  // Make this parameter nullable
+  }) : this.notificacoes = notificacoes ?? [];  // Assign an empty list if null is passed
+
 
   factory UserModel.fromSnapshot(DataSnapshot snapshot) {
     final data = snapshot.value as Map<dynamic, dynamic>;

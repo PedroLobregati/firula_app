@@ -16,10 +16,10 @@ class CreateGame extends StatefulWidget {
 
 class _CreateGameState extends State<CreateGame> {
   final userController = UserController();
-
   @override
   void initState() {
     super.initState();
+
     userController.verificarJogoCriado().then((bool resultado) {
       setState(() {
         jaPossuiJogo = resultado;

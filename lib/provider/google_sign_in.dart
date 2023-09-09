@@ -7,7 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleSignInProvider extends ChangeNotifier{
   final googleSignIn = GoogleSignIn();
-  GoogleSignInAccount? _user;
+  late GoogleSignInAccount _user;
   final DatabaseReference _userRef =
   FirebaseDatabase.instance.ref().child('FirulaData/users');
 
@@ -52,7 +52,7 @@ class GoogleSignInProvider extends ChangeNotifier{
           'localiz' : '',
           'possuiJogoCriado': false,
         });
-        print('Usuário salvo com sucesso');
+        print('Usuário salvo com sucesso!');
       }
     }).catchError((error) {
       print('Erro ao verificar o usuário: $error');

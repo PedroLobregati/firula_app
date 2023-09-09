@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:provider/provider.dart';
+import 'package:firula_app/controller/UserController.dart';
+import 'package:firula_app/model/UserModel.dart';
+import 'package:firula_app/provider/google_sign_in.dart';
 import 'package:firula_app/view/home.page.dart';
 import 'package:firula_app/view/login.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firula_app/provider/google_sign_in.dart';
-
-import '../controller/UserController.dart';
-import '../model/UserModel.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -37,8 +35,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onDataReceived(UserModel userData) {
     setState(() {
       userModel = userData;
-      _localizController.text = userModel!.localiz!;
-      _posController.text = userModel!.pos!;
+      _localizController.text = userModel?.localiz ?? '';
+      _posController.text = userModel?.pos ?? '';
     });
   }
 
@@ -56,13 +54,13 @@ class _ProfilePageState extends State<ProfilePage> {
               clipper: MyClipper(),
               child: Container(
                 height: 250.0,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.green, Colors.lightGreen.shade200],
-                    ),
-                  )
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.green, Colors.lightGreen.shade200],
+                  ),
+                ),
               ),
             ),
             Positioned(
@@ -73,7 +71,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 backgroundColor: Colors.white,
                 child: CircleAvatar(
                   radius: 82.0,
-                  backgroundImage: AssetImage('assets/path/to/your/image.jpg'), // add your image asset here
+                  backgroundImage: AssetImage(
+                      'assets/path/to/your/image.jpg'), // add your image asset here
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: CircleAvatar(
@@ -114,7 +113,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50), // Botão arredondado
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Padding
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10), // Padding
                         ),
                         onPressed: () async {
                           showAlertDialog(context);
@@ -131,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(height: 225),
                   Text(
-                    "${user?.displayName!}",
+                    "${user?.displayName ?? ''}",
                     style: TextStyle(
                       fontSize: 30,
                       color: Colors.black,
@@ -155,7 +155,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       controller: _localizController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.location_on, color: Colors.green),
-                        hintText: userModel!.localiz== '' ? "Localização" : userModel!.localiz,
+                        hintText: userModel?.localiz == ''
+                            ? "Localização"
+                            : userModel?.localiz,
                         border: InputBorder.none,
                       ),
                     ),
@@ -165,7 +167,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       controller: _posController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.sports_soccer, color: Colors.green),
-                        hintText: userModel!.pos == '' ? "Posição" : userModel!.pos,
+                        hintText: userModel?.pos == ''
+                            ? "Posição"
+                            : userModel?.pos,
                         border: InputBorder.none,
                       ),
                     ),
@@ -177,10 +181,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50), // Botão arredondado
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 70, vertical: 15), // Padding
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 70, vertical: 15), // Padding
                     ),
                     onPressed: () async {
-                      userController.salvarAlteracoes(_localizController.text, _posController.text);
+                      userController.salvarAlteracoes(
+                          _localizController.text, _posController.text);
                     },
                     child: Text(
                       'Salvar Alterações',
@@ -217,11 +223,13 @@ class _ProfilePageState extends State<ProfilePage> {
             new TextButton(
               child: new Text("Sim"),
               onPressed: () async {
-                final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+                final provider =
+                Provider.of<GoogleSignInProvider>(context, listen: false);
                 provider.googleLogout();
-                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => LoginPage()));
                 await _firebaseAuth.signOut().then(
-                      (user)=> Navigator.pushReplacement(
+                      (user) => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => LoginPage(),
@@ -244,10 +252,12 @@ class MyClipper extends CustomClipper<Path> {
     path.lineTo(0, size.height - 50);
     var controlPoint = Offset(50, size.height);
     var endPoint = Offset(size.width / 2, size.height);
-    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    path.quadraticBezierTo(
+        controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
     controlPoint = Offset(size.width - 50, size.height);
     endPoint = Offset(size.width, size.height - 50);
-    path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
+    path.quadraticBezierTo(
+        controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
     path.lineTo(size.width, 0);
     path.close();
     return path;
