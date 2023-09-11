@@ -87,7 +87,7 @@ class _MatchPageState extends State<MatchPage> {
                         icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                       ),
                       Text(
-                        "Jogo de ${_matchData!.host}",
+                        "Jogo de ${_matchData?.host ?? ""}",
                         style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -124,7 +124,7 @@ class _MatchPageState extends State<MatchPage> {
                                 SizedBox(width: 20),
                                 Expanded(
                                   child: Text(
-                                    '${_matchData!.local}',
+                                    '${_matchData?.local ?? ""}',
                                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),
                                     softWrap: true,
                                   ),
@@ -139,7 +139,7 @@ class _MatchPageState extends State<MatchPage> {
                                 SizedBox(width: 20),
                                 Expanded(
                                   child: Text(
-                                    '${_matchData!.data}',
+                                    '${_matchData?.data ?? ""}',
                                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),
                                   ),
                                 ),
@@ -153,7 +153,7 @@ class _MatchPageState extends State<MatchPage> {
                                 SizedBox(width: 20),
                                 Expanded(
                                   child: Text(
-                                    '${_matchData!.time}',
+                                    '${_matchData?.time ?? ""}',
                                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'sans-serif-light'),
                                   ),
                                 ),
@@ -180,7 +180,7 @@ class _MatchPageState extends State<MatchPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Criado por: ${_matchData!.host}",
+                        "Criado por: ${_matchData?.host ?? ""}",
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -202,7 +202,7 @@ class _MatchPageState extends State<MatchPage> {
                             label: Text("Lista vigente", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Colors.black)),
                           ),
                           Text(
-                            "   (${_matchData!.onList} / ${_matchData!.nPlayers})",
+                            "   (${_matchData?.onList ?? 15} / ${_matchData?.nPlayers ?? 1})",
                             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.green),
                           ),
                         ],
@@ -262,7 +262,7 @@ class _MatchPageState extends State<MatchPage> {
 
 
   Widget _buildButton(){
-    if(user!.uid == _matchData!.hostId){
+    if(user!.uid == _matchData?.hostId){
       return Padding(
         padding: const EdgeInsets.only(top: 0),
         child: ElevatedButton(
@@ -286,7 +286,7 @@ class _MatchPageState extends State<MatchPage> {
             style: ElevatedButton.styleFrom(
                 backgroundColor: _isListFull || solicitacaoEnviada ? Colors.white70 : Color(0xffA2C850)),
             onPressed: () async {
-              _isListFull || solicitacaoEnviada ? null : userService.sendToHost(widget.matchId, _matchData!.local, _matchData!.data);
+              _isListFull || solicitacaoEnviada ? null : userService.sendToHost(widget.matchId, _matchData?.local ?? "", _matchData?.data ?? "");
               setState(() {
                 solicitacaoEnviada = true;
               });
@@ -383,15 +383,3 @@ class WaveClipper extends CustomClipper<Path> {
     return false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -224,6 +224,7 @@ class _CreateGameState extends State<CreateGame> {
     if (!jaPossuiJogo) {
       return ElevatedButton(
         onPressed: () async {
+          print("INFO - ---------------- ${matchDataController.text}");
           userController.publicar(
               matchLocalController.text,
               matchDataController.text,

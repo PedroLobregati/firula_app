@@ -54,7 +54,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 stream: _database.child('FirulaData/users/${user!.uid}/received').orderByKey().limitToLast(10).onValue,
                 builder: (context, snapshot) {
                   final tileList = <Widget>[];
-                  if (snapshot.data!.snapshot.exists) {
+                  if (snapshot.data != null && snapshot.data!.snapshot.exists)  {
                     final myNotifications = Map<String, dynamic>.from(
                         snapshot.data!.snapshot.value as dynamic);
                     myNotifications.forEach((key, value) {

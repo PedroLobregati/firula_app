@@ -38,83 +38,107 @@ class UserController {
     }
   }
 
-  void cadastrar(email, senha, confirmarSenha, nome, context) async {
+  void cadastrar(String email, String senha, String confirmarSenha, String nome, context) async {
     bool checkSign = true;
-    if (email == null || email == ''){
+    if (email == null || email == '') {
       checkSign = false;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(duration: Duration(seconds: 1),content: Text('Email obrigatório'),),
+        const SnackBar(
+          duration: Duration(seconds: 1),
+          content: Text('Email obrigatório'),
+        ),
       );
     }
-    if (senha == null || senha == ''){
+    if (senha == null || senha == '') {
       checkSign = false;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(duration: Duration(seconds: 1),content: Text('Senha obrigatória'),),
+        const SnackBar(
+          duration: Duration(seconds: 1),
+          content: Text('Senha obrigatória'),
+        ),
       );
     }
     if (senha.toString() != confirmarSenha.toString()) {
       checkSign = false;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text('Senhas diferentes'),
-        backgroundColor: Colors.redAccent,
-      ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(seconds: 1),
+          content: Text('Senhas diferentes'),
+          backgroundColor: Colors.redAccent,
+        ),
       );
     }
-    if (nome == null || nome == ''){
+    if (nome == null || nome == '') {
       checkSign = false;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text('Campo nome obrigatório'),
-        backgroundColor: Colors.redAccent,
-      ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(seconds: 1),
+          content: Text('Campo nome obrigatório'),
+          backgroundColor: Colors.redAccent,
+        ),
       );
     }
-    if (checkSign == true ){
+
+    if (checkSign == true) {
       try {
-          userService.cadastrar(email, senha, confirmarSenha, nome, context);
+        UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: senha,);
+
+        if (userCredential != null) {
+          userCredential.user!.updateDisplayName(nome);
+          final profileData = database.child('FirulaData/users/${userCredential.user!.uid}');
+
+          await profileData.set({
+            'nome': nome,
+            'email': email,
+            'localiz': '',
+            'pos': '',
+            'possuiJogoCriado': false
+          });
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            ),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Cadastro realizado com sucesso!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            duration: Duration(seconds: 1),
-            content: Text('Senha fraca.'),
-            backgroundColor: Colors.redAccent,
-          ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              duration: Duration(seconds: 1),
+              content: Text('Senha fraca.'),
+              backgroundColor: Colors.redAccent,
+            ),
           );
-        }
-        else if (e.code == 'email-already-in-use') {
+        } else if (e.code == 'email-already-in-use') {
           checkSign = false;
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            duration: Duration(seconds: 1),
-            content: Text('Email já cadastrado.'),
-            backgroundColor: Colors.redAccent,
-          ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              duration: Duration(seconds: 1),
+              content: Text('Email já cadastrado.'),
+              backgroundColor: Colors.redAccent,
+            ),
           );
         }
-      }
-
-      if (checkSign == true){
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LoginPage(),
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Cadastro realizado com sucesso!'),
-          backgroundColor: Colors.green,
-        ),
-        );
       }
     }
   }
 
-  void publicar(local, data, numeroDeJogadores, hora, context) async {
+  void publicar(String local, String data, int numeroDeJogadores, String hora, context) async {
+    print("Controller info ----------------  $numeroDeJogadores");
     if (local == null || local == ''
-        || data == null || local == ''
+        || data == null || data == '' || local == ''
         || numeroDeJogadores == null ||
-        numeroDeJogadores == ''
+        numeroDeJogadores == '' || numeroDeJogadores == 0
         || hora == null ||
         hora == '') {
       ScaffoldMessenger.of(context).showSnackBar(

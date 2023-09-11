@@ -73,7 +73,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 backgroundColor: Colors.white,
                 child: CircleAvatar(
                   radius: 82.0,
-                  backgroundImage: AssetImage('assets/path/to/your/image.jpg'), // add your image asset here
+                  backgroundImage: (user?.photoURL != null && user!.photoURL is String)
+                      ? NetworkImage(user!.photoURL as String) as ImageProvider<Object>?
+                      : AssetImage('assets/path/to/your/image.jpg') as ImageProvider<Object>?,
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: CircleAvatar(
@@ -89,6 +91,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
+
+
+
             SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 35),
               child: Column(
@@ -131,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(height: 225),
                   Text(
-                    "${user?.displayName!}",
+                    "${userModel?.nome ?? 'Carregando...'}",
                     style: TextStyle(
                       fontSize: 30,
                       color: Colors.black,
@@ -141,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(height: 20),
                   TextFieldContainer(
                     child: TextField(
-                      controller: TextEditingController(text: user?.email),
+                      controller: TextEditingController(text: userModel?.email?? 'carregando...'),
                       enabled: false,
                       decoration: InputDecoration(
                         icon: Icon(Icons.email, color: Colors.green),
@@ -155,7 +160,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       controller: _localizController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.location_on, color: Colors.green),
-                        hintText: userModel!.localiz== '' ? "Localização" : userModel!.localiz,
+                        hintText: (userModel?.localiz == null || userModel?.localiz == "")
+                            ? "Localização"
+                            : userModel?.localiz,
                         border: InputBorder.none,
                       ),
                     ),
@@ -165,7 +172,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       controller: _posController,
                       decoration: InputDecoration(
                         icon: Icon(Icons.sports_soccer, color: Colors.green),
-                        hintText: userModel!.pos == '' ? "Posição" : userModel!.pos,
+                        hintText: (userModel?.pos == null || userModel?.pos == "")
+                            ? "Posição"
+                            : userModel?.pos,
                         border: InputBorder.none,
                       ),
                     ),
@@ -181,6 +190,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     onPressed: () async {
                       userController.salvarAlteracoes(_localizController.text, _posController.text);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.green,
+                          content: Text('Alterações salvas'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
                     },
                     child: Text(
                       'Salvar Alterações',
